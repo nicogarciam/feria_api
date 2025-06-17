@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "18205e296d42b59f061d46ac2261aafe",
+    "content-hash": "01cb1e12ad2ee64af75de923c47d0f63",
     "packages": [
         {
             "name": "appointer/swaggervel",
@@ -2012,23 +2012,22 @@
         },
         {
             "name": "infyomlabs/swagger-generator",
-            "version": "dev-master",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/InfyOmLabs/swagger-generator.git",
-                "reference": "ab9075496e3d34bf087dabb22003d83490646f40"
+                "reference": "282dea4b8d8a369a172931c0ab8e6c6296fd600c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InfyOmLabs/swagger-generator/zipball/ab9075496e3d34bf087dabb22003d83490646f40",
-                "reference": "ab9075496e3d34bf087dabb22003d83490646f40",
+                "url": "https://api.github.com/repos/InfyOmLabs/swagger-generator/zipball/282dea4b8d8a369a172931c0ab8e6c6296fd600c",
+                "reference": "282dea4b8d8a369a172931c0ab8e6c6296fd600c",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0",
                 "php": ">=5.5.9"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -2061,7 +2060,7 @@
             ],
             "support": {
                 "issues": "https://github.com/InfyOmLabs/swagger-generator/issues",
-                "source": "https://github.com/InfyOmLabs/swagger-generator/tree/v3.1.0"
+                "source": "https://github.com/InfyOmLabs/swagger-generator/tree/v3.2.0"
             },
             "funding": [
                 {
@@ -2069,7 +2068,7 @@
                     "type": "opencollective"
                 }
             ],
-            "time": "2022-07-25T05:04:49+00:00"
+            "time": "2023-04-04T11:04:49+00:00"
         },
         {
             "name": "laracasts/flash",
@@ -10926,7 +10925,6 @@
         "appointer/swaggervel": 20,
         "infyomlabs/adminlte-templates": 20,
         "infyomlabs/laravel-generator": 20,
-        "infyomlabs/swagger-generator": 20,
         "laravel/socialite": 20
     },
     "prefer-stable": true,
@@ -10934,6 +10932,6 @@
     "platform": {
         "php": "^7.4"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

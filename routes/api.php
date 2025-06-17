@@ -71,6 +71,9 @@ Route::group([
 
 
     Route::post('images/upload','App\Http\Controllers\API\ImageAPIController@uploadImage');
+    Route::post('images/upload_general','App\Http\Controllers\API\ImageAPIController@uploadImageGeneral');
+    Route::post('images/{id}/extract_features','App\Http\Controllers\API\ImageAPIController@extractFeatures');
+    Route::post('images/{id}/suggest_price', 'App\Http\Controllers\API\ImageAPIController@suggestPrice'); // New route
     Route::delete('images/delete/{id}','App\Http\Controllers\API\ImageAPIController@delete');
     Route::put('images/set_primary','App\Http\Controllers\API\ImageAPIController@set_primary');
 
