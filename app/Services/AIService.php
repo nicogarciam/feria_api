@@ -62,7 +62,10 @@ class AIService
                 return ['error' => 'Could not determine image MIME type.', 'estimation_basis' => 'error_mime_type'];
             }
 
-            $prompt = "Analyze this image of a garment and extract its primary color, type of garment (e.g., shirt, pants, dress), and its perceived condition (e.g., new, good, fair, poor). Return the answer as a JSON object with keys 'color', 'type', and 'condition'.";
+            $prompt = "Analyze this image of a garment and extract its primary color,
+            type of garment (e.g., shirt, pants, dress),
+            and its perceived condition (e.g., new, good, fair, poor).
+            Return the answer as a JSON object with keys 'color', 'type', and 'condition'.";
 
             $geminiVisionEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent";
 
