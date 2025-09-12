@@ -67,6 +67,7 @@ class ProductRepository extends BaseRepository
 
         $query->join('sale_items', 'products.id', '=', 'sale_items.product_id');
         $query->where('sale_items.sale_id', $saleId);
+        $query->select('products.*', 'sale_items.id as item_id', 'sale_items.price as item_price');
 
         return $query->get();
     }

@@ -4,23 +4,27 @@ namespace App\Services;
 
 use App\Models\Movement;
 use App\Models\Sale;
+use App\Models\SaleState;
 use App\Models\SaleStatuses;
 use App\Repositories\MovementRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use NunoMaduro\Collision\Adapters\Phpunit\State;
 
 class SaleService
 {
 
 
-    public function checkSaleState($payment)
+    public static function checkSaleState($payment, $event = "update")
     {
-        if ($payment->booking_id) {
-            $bo = Sale::find($payment->sale_id);
-            if ($bo->booking_state->name == 'NEW' && $payment->type == 'SIGN') {
-
+        if ($payment->sale_id) {
+            $sa = Sale::find($payment->sale_id);
+            $paid = $sa->total_paid();
+            $newStateID = $paid >= $sa->total_price ? SaleState::PAID : ($paid < $sa->total_price ? SaleState::CONFIRMED : $sa->sale_state_id);
+            if ($sa->sale_state_id !== $newStateID) {
+                SaleService::setSaleState($sa, $newStateID, $event, null, true);
             }
         }
     }
@@ -43,6 +47,7 @@ class SaleService
         $newState->date_from = Carbon::now();
         $newState->state_id = $newStateId;
         $newState->sale_id = $sa->id;
+        $newState->user_email = auth()->user()->email;
 
         $newState->save();
 

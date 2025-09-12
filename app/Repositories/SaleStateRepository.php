@@ -54,6 +54,7 @@ class SaleStateRepository extends BaseRepository
     {
         return DB::table('sale_statuses')
             ->join('sale_states', 'sale_statuses.state_id', '=', 'sale_states.id')
+            ->select('sale_statuses.*', 'sale_states.name as name')
             ->where('sale_id', $saleId)
             ->orderBy('date_from', 'desc')
             ->get();

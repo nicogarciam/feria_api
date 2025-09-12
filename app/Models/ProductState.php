@@ -12,6 +12,10 @@ class ProductState extends Model
 
     use HasFactory;
 
+    const AVAILABLE = 1;
+    const TESTING = 2;
+    const SOLD = 3;
+
     public $table = 'product_states';
 
     const CREATED_AT = 'created_at';

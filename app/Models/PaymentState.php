@@ -9,18 +9,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PaymentState extends Model
 {
-    use SoftDeletes;
 
     use HasFactory;
 
     public $table = 'payment_states';
 
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
 
     protected $dates = ['deleted_at'];
 
+    const CONFIRMED = 1;
+    const PENDING_CONFIRM = 2;
+    const CANCELED = 3;
+    const REFUNDED = 4;
+    const PENDING_PAYMENT = 5;
+    const PENDING_APPROVAL = 6;
+    const PENDING_REFUND = 7;
 
 
     public $fillable = [
@@ -37,8 +40,7 @@ class PaymentState extends Model
     protected $casts = [
         'id' => 'integer',
         'name' => 'string',
-        'description' => 'string',
-        'active' => 'boolean'
+        'description' => 'string'
     ];
 
     /**
@@ -47,10 +49,7 @@ class PaymentState extends Model
      * @var array
      */
     public static $rules = [
-        'name' => 'required|string|max:255',
-        'created_at' => 'nullable',
-        'updated_at' => 'nullable',
-        'deleted_at' => 'nullable'
+        'name' => 'required|string|max:50',
     ];
 
 

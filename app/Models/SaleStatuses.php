@@ -28,7 +28,8 @@ class SaleStatuses extends Model
         'date_to',
         'sale_id',
         'state_id',
-        'state'
+        'state',
+        'user_email'
     ];
 
 

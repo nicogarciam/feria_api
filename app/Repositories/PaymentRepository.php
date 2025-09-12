@@ -102,4 +102,21 @@ class PaymentRepository extends BaseRepository
 
         return $query->get();
     }
+
+    public function forSaleFull($saleId)
+    {
+
+        $query = $this->model->newQuery();
+        $withs = ['customer'];
+
+        if (count($withs)) {
+            foreach($withs as $value) {
+                $query->with($value);
+            }
+        }
+
+        $query->where('sale_id', $saleId);
+
+        return $query->get();
+    }
 }

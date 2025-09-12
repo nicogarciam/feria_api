@@ -15,8 +15,8 @@ class Image extends Model
         'title',
         'primary',
         'benefit_id',
-        'hotel_id',
-        'activity_id',
+        'store_id',
+        'product_id',
         'src'
     ];
 

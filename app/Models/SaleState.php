@@ -12,6 +12,13 @@ class SaleState extends Model
 
     use HasFactory;
 
+    const NEW = 1;
+    const CONFIRMED = 2;
+    const PAID = 3;
+    const CANCELED = 4;
+    const CART = 5;
+    const CLOSED = 6;
+
     public $table = 'sale_states';
 
     const CREATED_AT = 'created_at';

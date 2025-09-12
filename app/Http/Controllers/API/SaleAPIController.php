@@ -7,8 +7,11 @@ use App\Http\Requests\API\CreateSaleAPIRequest;
 use App\Http\Requests\API\UpdateBookingAPIRequest;
 use App\Http\Requests\API\UpdateSaleAPIRequest;
 use App\Models\Product;
+use App\Models\ProductState;
 use App\Models\Sale;
 use App\Models\BookingCode;
+use App\Models\SaleItem;
+use App\Models\SaleState;
 use App\Repositories\AccommodationPriceRepository;
 use App\Repositories\SaleRepository;
 use App\Services\BookingService;
@@ -81,6 +84,27 @@ class SaleAPIController extends AppBaseController
         return response()->json($sales);
     }
 
+    public function removeProduct($saleId = null, $productId = null)
+    {
+        if (empty($saleId) || empty($productId)) {
+            return $this->sendError('Invalid parameters');
+        }
+        DB::beginTransaction();
+            $deleted = SaleItem::where('sale_id', $saleId)->where('product_id', $productId)->delete();
+            $sale = $this->saleRepository->find($saleId, ['products']);
+            $sale->total_price = $sale->products->sum('price');
+
+            $sale->save();
+            SaleService::checkSaleState($sale, 'remove.product');
+        DB::commit();
+
+        return response()->json([
+                'status' => 'success',
+                'message' => 'Product removed successfully',
+                'sale' => $sale,
+                'deleted' => $deleted]);
+    }
+
     public function countResume(Request $request)
     {
         $states_ids = explode(',',$request->get('states'));
@@ -131,7 +155,7 @@ class SaleAPIController extends AppBaseController
         $input['user'] = auth()->user()->email;
 
         DB::beginTransaction();
-        $sale_state_id = $input['sale_state_id'] = isset($input['state']) ? $input['state']['id'] : 1 ;
+        $sale_state_id = $input['sale_state_id'] = isset($input['state']) ? $input['state']['id'] : SaleState::CONFIRMED ;
         $sale = $this->saleRepository->create($input);
 
         SaleService::setSaleState($sale, $sale_state_id,'sale_created',null, true);
@@ -222,7 +246,6 @@ class SaleAPIController extends AppBaseController
 
     public function destroy($id)
     {
-
         $valid = DataAccessValidation::validateSale($id);
 
         if (!$valid) {
@@ -235,22 +258,29 @@ class SaleAPIController extends AppBaseController
             return $this->sendError('Sale not found');
         }
 
-        $products = DB::table('sale_items')
-            ->where('sale_id', $sale->id)
-            ->pluck('product_id');
+        try {
+            DB::beginTransaction();
 
-        // Actualizar el estado de los productos a disponible (asumiendo que el estado 1 es "disponible")
-        DB::table('products')
-            ->whereIn('id', $products)
-            ->update(['state_id' => 1]);
+            $products = DB::table('sale_items')
+                ->where('sale_id', $sale->id)
+                ->pluck('product_id');
 
+            // Actualizar el estado de los productos a disponible (asumiendo que el estado 1 es "disponible")
+            DB::table('products')
+                ->whereIn('id', $products)
+                ->update(['state_id' => ProductState::AVAILABLE]);
 
-        DB::table('sale_items')->where('sale_id','=',$sale->id)->delete();
-        DB::table('movements')->where('sale_id','=',$sale->id)->delete();
-        DB::table('sale_statuses')->where('sale_id','=',$sale->id)->delete();
+            DB::table('sale_items')->where('sale_id','=',$sale->id)->delete();
+            DB::table('movements')->where('sale_id','=',$sale->id)->delete();
+            DB::table('sale_statuses')->where('sale_id','=',$sale->id)->delete();
 
-        $sale->delete();
+            $sale->delete();
 
-        return $this->sendSuccess('Sale deleted successfully');
+            DB::commit();
+            return $this->sendSuccess('Sale deleted successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error al eliminar la venta: ' . $e->getMessage());
+        }
     }
 }

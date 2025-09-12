@@ -26,6 +26,7 @@ class Product extends Model
 
     public $fillable = [
         'code',
+        'title',
         'description',
         'store_id',
         'provider_id',
@@ -77,6 +78,11 @@ class Product extends Model
         return $this->belongsTo('App\Models\ProductState');
     }
 
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
     public function provider()
     {
         return $this->belongsTo('App\Models\Provider');
@@ -86,6 +92,5 @@ class Product extends Model
     {
         return ProductFactory::new();
     }
-
 
 }

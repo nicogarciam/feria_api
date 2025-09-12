@@ -6,6 +6,7 @@ use App\Http\Controllers\AppBaseController;
 use App\Models\Benefit;
 use App\Models\Entity;
 use App\Models\Image;
+use App\Models\Product;
 use App\Services\AIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,11 +35,93 @@ class ImageAPIController extends AppBaseController
 
     }
 
+    public function uploadProductImage(Request $request, $productId)
+    {
+
+        try {
+            $product = Product::findOrFail($productId);
+            $images = $request->input('images');
+            $savedImages = [];
+            Image::where('product_id', $productId)->delete();
+
+            foreach ($images as $image) {
+                // Decodificar la imagen base64
+                if (preg_match('/^data:image\/(\w+);base64,/', $image['src'])) {
+                    $data = substr($image['src'], strpos($image['src'], ',') + 1);
+                    $data = base64_decode($data);
+
+                    // Crear nombre único para la imagen
+                    $fileName = 'product_' . $productId . '_' . uniqid() . '.png';
+
+                    // Guardar la imagen en el storage
+                    Storage::disk('public')->put('products/' . $fileName, $data);
+
+                    // Crear registro en la base de datos
+                    $productImage = Image::create([
+                        'product_id' => $productId,
+                        'src' => 'storage/products/' . $fileName,
+                        'title' => $fileName,
+                    ]);
+
+                    $savedImages[] = $productImage;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Imágenes guardadas correctamente',
+                'data' => $savedImages
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar las imágenes: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function deleteProductImage($productId)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Obtener todas las imágenes asociadas al producto
+            $images = Image::where('product_id', $productId)->get();
+
+            if ($images->isEmpty()) {
+                return $this->sendError('No se encontraron imágenes para este producto');
+            }
+
+            foreach ($images as $image) {
+                // Obtener la ruta del archivo
+                $filePath = str_replace('storage/', '', $image->src);
+
+                // Eliminar el archivo físico
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                }
+
+                // Eliminar el registro de la base de datos
+                $image->delete();
+            }
+
+            DB::commit();
+            return $this->sendSuccess('Imágenes eliminadas correctamente');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error al eliminar las imágenes: ' . $e->getMessage());
+        }
+
+
+    }
+
     public function uploadImage(Request $request)
     {
 
         $input = $request->all();
-
 
         if ($request->hasFile('image')) {
             $date = time();
@@ -56,10 +139,14 @@ class ImageAPIController extends AppBaseController
 
 //            $account = $this->accountRepository->update($account->toArray(), $account->id);
 
-            $resp['src'] = url($path);
-            $resp['id'] = DB::table('images')->insertGetId([
-                'src' => url($path)
+            $newImage = array([
+                'title' => $filename,
+                'src' => url($path),
+                'product_id' => $input['product_id'],
             ]);
+
+            $resp['src'] = url($path);
+            $resp['id'] = DB::table('images')->insertGetId($newImage);
 
             return response()->json($resp);
         } else {
