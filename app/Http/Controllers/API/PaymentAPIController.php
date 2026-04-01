@@ -50,6 +50,16 @@ class PaymentAPIController extends AppBaseController
         return response()->json($payments);
     }
 
+    public function findForSale($saleId = null)
+    {
+
+
+        $payments = $this->paymentRepository->forSaleFull($saleId);
+
+        return response()->json($payments);
+
+    }
+
     public function store(CreatePaymentAPIRequest $request)
     {
         $input = $request->all();
@@ -57,7 +67,7 @@ class PaymentAPIController extends AppBaseController
         $payment = $this->paymentRepository->create($input);
 
         MovementsService::generatePayCredit($payment);
-        SaleService::checkSaleState($payment);
+        SaleService::checkSaleState($payment, 'new.payment');
 
         return response()->json($payment);
     }
@@ -94,16 +104,6 @@ class PaymentAPIController extends AppBaseController
 //        return $this->sendResponse(new PaymentResource($payment), 'Payment updated successfully');
     }
 
-    /**
-     * @param int $id
-     * @return Response
-     *
-     * @SWG\Delete(
-     *      path="/payments/{id}",
-     *      summary="Remove the specified Payment from storage",
-     *      tags={"Payment"},
-     *      description="Delete Payment",
-     */
     public function destroy($id)
     {
         /** @var Payment $payment */
@@ -113,9 +113,18 @@ class PaymentAPIController extends AppBaseController
             return $this->sendError('Payment not found');
         }
 
-        $payment->delete();
-        DB::table('movements')->where('pay_id','=',id)->delete();
+        try {
+            DB::beginTransaction();
 
-        return $this->sendSuccess('Payment deleted successfully');
+            $payment->delete();
+            DB::table('movements')->where('pay_id','=',$id)->delete();
+            SaleService::checkSaleState($payment, "delete.payment");
+
+            DB::commit();
+            return $this->sendSuccess('Payment deleted successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error al eliminar el pago: ' . $e->getMessage());
+        }
     }
 }

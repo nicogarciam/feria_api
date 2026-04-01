@@ -50,7 +50,7 @@ class MovementAPIController extends AppBaseController
         $balance = new Balance();
         $for = $input['for'];
 
-        $for['store_id'] = isset($for['store_id']) ? $for['store_id'] : session('store_id');
+        $for['store_id'] = isset($for['store_id']) ?? session('store_id');
 
         $valid = DataAccessValidation::validateStore($for['store_id']);
 
@@ -58,6 +58,10 @@ class MovementAPIController extends AppBaseController
             return $this->sendError('unauthorized.store','403');
         }
 
+        // Si llega fecha_from, busca el balance anterior hasta esa fecha
+
+        // Si no llega fecha_from, pongo balance previo en 0
+        // Porque voy a consultar todos los movimientos.
         $date_from = $input['date_from'] ?? null;
         $balance_prev = $date_from ? $this->movementRepository->balance(null, $date_from, $for ) : 0;
 

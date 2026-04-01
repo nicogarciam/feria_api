@@ -44,7 +44,8 @@ class Sale extends Model
         'coupon_code',
         'days_to_confirm',
         'days_to_cancel',
-        'user'
+        'user',
+        'code'
     ];
 
     /**
@@ -96,6 +97,14 @@ class Sale extends Model
 
         return $this->belongsToMany(Product::class, 'sale_items')->as('sale_item')
             ->withPivot('product_id', 'price');
+    }
+
+    public function payments(){
+         return $this->hasMany(Payment::class);
+    }
+
+    public function total_paid() {
+        return $this->payments()->sum('amount');
     }
 
 

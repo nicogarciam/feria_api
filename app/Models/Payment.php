@@ -26,17 +26,22 @@ class Payment extends Model
 
     public $fillable = [
         'pay_date',
+        'sale_id',
+        'note',
+        'amount',
+        'discount',
+        'total',
+        'coupon_code',
+        'payment_type_id',
+        'payment_state_id',
         'user_id',
         'pay_method',
         'pay_ref',
-        'amount',
-        'payment_state_id',
-        'discount',
-        'coupon_code',
-        'sale_id',
-        'user',
         'store_id',
-        'bank_account_id'
+        'bank_account_id',
+        'user',
+        'concept'
+
     ];
 
     /**
@@ -52,6 +57,7 @@ class Payment extends Model
         'pay_method_dsc' => 'string',
         'pay_ref' => 'string',
         'amount' => 'double',
+        'total' => 'double',
         'pay_date' => 'datetime',
         'discount' => 'double',
         'discount_cod' => 'integer',
@@ -81,6 +87,7 @@ class Payment extends Model
     {
         return $this->belongsTo('App\Models\Customer');
     }
+
     public function bankAccount()
     {
         return $this->belongsTo('App\Models\BankAccount');

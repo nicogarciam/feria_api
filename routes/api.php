@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\ImageAPIController;
 use App\Http\Controllers\API\MovementAPIController;
+use App\Http\Controllers\API\PaymentAPIController;
 use App\Http\Controllers\API\ProductAPIController;
 use App\Http\Controllers\API\SaleAPIController;
 use App\Http\Controllers\API\SaleStateAPIController;
@@ -60,29 +62,31 @@ Route::group([
     Route::get('store/{storeId}/categories',
         'App\Http\Controllers\API\CategoryAPIController@findByStore');
 
-    Route::get('store/{storeId}/products',
-        'App\Http\Controllers\API\ProductAPIController@findByStore');
+    Route::get('store/{storeId}/products',[ProductAPIController::class,'findByStore'] );
 
-    Route::get('store/{storeId}/products/{type}',
-        'App\Http\Controllers\API\ProductAPIController@findByStore');
+    Route::get('store/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
 
 
     Route::get('stores/{storeId}/sale_states', [SaleStateAPIController::class,'findByStore'] );
 
 
-    Route::post('images/upload','App\Http\Controllers\API\ImageAPIController@uploadImage');
+    Route::post('images/upload',[ImageAPIController::class, 'uploadImage']);
+    Route::post('images/product/{productId}/upload',[ImageAPIController::class, 'uploadProductImage']);
+    Route::post('images/upload_general','App\Http\Controllers\API\ImageAPIController@uploadImageGeneral');
+    Route::post('images/{id}/extract_features','App\Http\Controllers\API\ImageAPIController@extractFeatures');
+    Route::post('images/{id}/suggest_price', 'App\Http\Controllers\API\ImageAPIController@suggestPrice'); // New route
     Route::delete('images/delete/{id}','App\Http\Controllers\API\ImageAPIController@delete');
     Route::put('images/set_primary','App\Http\Controllers\API\ImageAPIController@set_primary');
 
 
     Route::get('sales/resume', [SaleAPIController::class,'countResume']);
     Route::get('sales/code/{saleId}', [SaleAPIController::class,'generateCode']);
+    Route::get('sales/{saleId}/remove/{productId}',[SaleAPIController::class,'removeProduct'] );
 
     Route::get('sales/{saleId}/products', [ProductAPIController::class,'findForSale'] );
+    Route::get('sales/{saleId}/pays', [PaymentAPIController::class,'findForSale'] );
 
     Route::get('sales/{saleId}/statuses', [SaleStateAPIController::class,'findSaleHistoric'] );
-
-    Route::get('sale_states/historic/{saleId}',[SaleStateAPIController::class,'findSaleHistoric'] );
 
 
 //    RESOURCES

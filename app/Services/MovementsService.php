@@ -16,7 +16,7 @@ class MovementsService
     {
         $this->movementRepository = $repo;
     }
-    public function generateSaleDebit($sale)
+    static function generateSaleDebit($sale)
     {
         $movement = new Movement();
         $movement->sale_id = $sale->id;
@@ -32,12 +32,12 @@ class MovementsService
     }
 
 
-    public function generatePayCredit($pay)
+    static function generatePayCredit($pay)
     {
         $movement = new Movement();
         $movement->pay_id = $pay->id;
         $movement->store_id = $pay->store_id;
-        $movement->customer_id = $pay->payer_id;
+        $movement->customer_id = $pay->customer_id;
         $movement->account_id = $pay->bank_account_id;
 
         $movement->date = $pay->pay_date;
@@ -50,7 +50,7 @@ class MovementsService
     }
 
 
-    public function generateProviderCredit($product, $sale )
+    static function generateProviderCredit($product, $sale )
     {
         $movement = new Movement();
         $movement->sale_id = $sale->id;
@@ -83,7 +83,7 @@ class MovementsService
 //        $movement->save();
     }
 
-    public function generateChargeDebit($charge)
+    static function generateChargeDebit($charge)
     {
         $movement = new Movement();
         $movement->store_id = $charge->store_id;

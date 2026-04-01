@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class SaleItem extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory;
 
     /**
      * Get the prunable model query.

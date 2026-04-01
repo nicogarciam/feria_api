@@ -19,7 +19,7 @@
         "firebase/php-jwt": "^6.4",
         "fruitcake/laravel-cors": "^2.0",
         "google/apiclient": "^2.13",
-        "guzzlehttp/guzzle": "^7.0.1",
+        "guzzlehttp/guzzle": "^7.5",
         "infyomlabs/adminlte-templates": "8.0.x-dev",
         "infyomlabs/laravel-generator": "8.0.x-dev",
         "infyomlabs/swagger-generator": "v3.2.0",
