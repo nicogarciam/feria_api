@@ -9,7 +9,30 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @SWG\Definition(
  *      definition="StoreDiscount",
- *      required={"booking_id", "description", "discount"},
+ *      required={"sale_id", "description", "discount"},
+ *      @SWG\Property(
+ *          property="id",
+ *          type="integer",
+ *          format="int64"
+ *      ),
+ *      @SWG\Property(
+ *          property="sale_id",
+ *          type="integer"
+ *      ),
+ *      @SWG\Property(
+ *          property="discount_id",
+ *          type="integer"
+ *      ),
+ *      @SWG\Property(
+ *          property="description",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="discount",
+ *          type="number",
+ *          format="double"
+ *      )
+ * )
  */
 class StoreDiscount extends Model
 {
@@ -56,6 +79,4 @@ class StoreDiscount extends Model
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'
     ];
-
-
 }

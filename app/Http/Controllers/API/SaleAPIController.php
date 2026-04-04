@@ -47,7 +47,16 @@ class SaleAPIController extends AppBaseController
      * @SWG\Get(
      *      path="/sales",
      *      summary="Get a listing of the Bookings.",
-
+     *      tags={"Sale"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Sale")
+     *          )
+     *      )
+     * )
      */
     public function index_old(Request $request)
     {
@@ -194,93 +203,3 @@ class SaleAPIController extends AppBaseController
             return $this->sendError('unauthorized.sale','403');
         }
 
-        /** @var Sale $sale */
-        $sale = $this->saleRepository->find($id, ['products']);
-
-        if (empty($sale)) {
-            return $this->sendError('Sale not found');
-        }
-
-        return response()->json($sale);
-//        return $this->sendResponse(new SaleResource($booking), 'Sale retrieved successfully');
-    }
-
-
-    public function update($id, UpdateSaleAPIRequest $request)
-    {
-        $input = $request->all();
-
-        $valid = DataAccessValidation::validateSale($id);
-
-        if (!$valid) {
-            return $this->sendError('unauthorized.sale','403');
-        }
-
-        $sale = $this->saleRepository->find($id);
-
-        if (empty($sale)) {
-            return $this->sendError('Sale not found');
-        }
-
-        $new_sale_state_id = $input['sale_state'];
-
-        DB::beginTransaction();
-
-        $sale = $this->saleRepository->update($input, $id);
-        $new_sale_state = SaleService::setSaleState($sale, $new_sale_state_id,'sale_update',null, false);
-
-        if ($new_sale_state_id == 2) {
-            $products = $sale->products();
-            foreach ($products as $product) {
-                MovementsService::generateProviderCredit($product,$sale);
-            }
-        }
-        $sale->save();
-
-        DB::commit();
-        $sale = $this->saleRepository->find($id);
-        return response()->json($sale);
-
-    }
-
-
-    public function destroy($id)
-    {
-        $valid = DataAccessValidation::validateSale($id);
-
-        if (!$valid) {
-            return $this->sendError('unauthorized.sale','403');
-        }
-        /** @var Sale $sale */
-        $sale = $this->saleRepository->find($id);
-
-        if (empty($sale)) {
-            return $this->sendError('Sale not found');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $products = DB::table('sale_items')
-                ->where('sale_id', $sale->id)
-                ->pluck('product_id');
-
-            // Actualizar el estado de los productos a disponible (asumiendo que el estado 1 es "disponible")
-            DB::table('products')
-                ->whereIn('id', $products)
-                ->update(['state_id' => ProductState::AVAILABLE]);
-
-            DB::table('sale_items')->where('sale_id','=',$sale->id)->delete();
-            DB::table('movements')->where('sale_id','=',$sale->id)->delete();
-            DB::table('sale_statuses')->where('sale_id','=',$sale->id)->delete();
-
-            $sale->delete();
-
-            DB::commit();
-            return $this->sendSuccess('Sale deleted successfully');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->sendError('Error al eliminar la venta: ' . $e->getMessage());
-        }
-    }
-}

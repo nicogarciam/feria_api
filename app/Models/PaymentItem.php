@@ -6,7 +6,30 @@ use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
+/**
+ * @SWG\Definition(
+ *      definition="PaymentItem",
+ *      required={"payment_id","amount"},
+ *      @SWG\Property(
+ *          property="id",
+ *          type="integer",
+ *          format="int64"
+ *      ),
+ *      @SWG\Property(
+ *          property="payment_id",
+ *          type="integer"
+ *      ),
+ *      @SWG\Property(
+ *          property="concept",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="amount",
+ *          type="number",
+ *          format="double"
+ *      )
+ * )
+ */
 class PaymentItem extends Model
 {
     use SoftDeletes;
@@ -51,6 +74,4 @@ class PaymentItem extends Model
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'
     ];
-
-
 }

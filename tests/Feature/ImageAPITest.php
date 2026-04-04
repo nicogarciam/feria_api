@@ -7,10 +7,10 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Account; // Assuming Account model is used for authentication
 use Illuminate\Http\UploadedFile;
-use Tymon\JWTAuth\Facades\JWTAuth; // For JWT authentication
 use Illuminate\Support\Facades\Storage; // For file storage assertions
 use App\Models\Image; // For creating Image model instances
 use Illuminate\Support\Facades\Http; // For mocking HTTP calls
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth; // For JWT authentication
 
 class ImageAPITest extends TestCase
 {
@@ -119,16 +119,16 @@ class ImageAPITest extends TestCase
         ])->postJson("/api/images/{$image->id}/extract_features");
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'data' => [
-                         'color' => 'red',
-                         'type' => 'dress',
-                         'condition' => 'good',
-                         'estimation_basis' => 'gemini_vision_api'
-                     ],
-                     'message' => 'Image features extracted successfully.'
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'color' => 'red',
+                    'type' => 'dress',
+                    'condition' => 'good',
+                    'estimation_basis' => 'gemini_vision_api'
+                ],
+                'message' => 'Image features extracted successfully.'
+            ]);
 
         Http::assertSent(function ($request) {
             return Str::contains($request->url(), 'gemini-pro-vision:generateContent');
@@ -182,16 +182,16 @@ class ImageAPITest extends TestCase
         ])->postJson("/api/images/{$image->id}/suggest_price");
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'data' => [
-                         'min_price' => 75,
-                         'max_price' => 125,
-                         'currency' => 'EUR',
-                         'estimation_basis' => 'gemini_api'
-                     ],
-                     'message' => 'Price suggestion retrieved successfully.'
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'min_price' => 75,
+                    'max_price' => 125,
+                    'currency' => 'EUR',
+                    'estimation_basis' => 'gemini_api'
+                ],
+                'message' => 'Price suggestion retrieved successfully.'
+            ]);
 
         // Assert that both mocked endpoints were called
         Http::assertSent(function ($request) {

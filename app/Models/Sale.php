@@ -11,7 +11,83 @@ use Illuminate\Support\Carbon;
 /**
  * @SWG\Definition(
  *      definition="Sale",
-
+ *      required={"store_id", "sale_state_id", "date_sale", "total_price"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Sale id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="store_id",
+ *          description="Store id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="customer_id",
+ *          description="Customer id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="sale_state_id",
+ *          description="Sale state id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_sale",
+ *          description="Sale date",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_pay",
+ *          description="Payment date",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="note",
+ *          description="Sale note",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="total_price",
+ *          description="Total price",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="coupon_code",
+ *          description="Coupon code",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="days_to_confirm",
+ *          description="Days to confirm",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="days_to_cancel",
+ *          description="Days to cancel",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="user",
+ *          description="User name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="code",
+ *          description="Sale code",
+ *          type="string"
+ *      )
+ * )
  */
 class Sale extends Model
 {
@@ -93,19 +169,20 @@ class Sale extends Model
         return $this->belongsTo('App\Models\SaleState');
     }
 
-    public function products(){
+    public function products()
+    {
 
         return $this->belongsToMany(Product::class, 'sale_items')->as('sale_item')
             ->withPivot('product_id', 'price');
     }
 
-    public function payments(){
-         return $this->hasMany(Payment::class);
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 
-    public function total_paid() {
+    public function total_paid()
+    {
         return $this->payments()->sum('amount');
     }
-
-
 }

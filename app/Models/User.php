@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -96,27 +96,28 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne('App\Models\Account');
     }
 
-    public function myAccount(){
+    public function myAccount()
+    {
         $user = DB::table('accounts')
             ->leftJoin('users', 'users.id', '=', 'accounts.user_id')
             ->select('accounts.*')
-            ->where('users.id',$this->id)
-//            ->toSql();
+            ->where('users.id', $this->id)
+            //            ->toSql();
             ->first();
 
         return $user;
     }
 
 
-    public function myStores(){
+    public function myStores()
+    {
         $stores = Store::with('city')
-            ->Where('stores.owner_id' ,$this->id)
-//            ->toSql();
-        ->get();
+            ->Where('stores.owner_id', $this->id)
+            //            ->toSql();
+            ->get();
 
         $this->stores = $stores;
 
         return $stores;
     }
-
 }

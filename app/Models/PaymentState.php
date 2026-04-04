@@ -6,7 +6,29 @@ use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
+/**
+ * @SWG\Definition(
+ *      definition="PaymentState",
+ *      required={"name"},
+ *      @SWG\Property(
+ *          property="id",
+ *          type="integer",
+ *          format="int64"
+ *      ),
+ *      @SWG\Property(
+ *          property="name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="description",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="active",
+ *          type="boolean"
+ *      )
+ * )
+ */
 class PaymentState extends Model
 {
 
@@ -51,6 +73,4 @@ class PaymentState extends Model
     public static $rules = [
         'name' => 'required|string|max:50',
     ];
-
-
 }

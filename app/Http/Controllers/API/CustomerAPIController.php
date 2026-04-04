@@ -36,6 +36,11 @@ class CustomerAPIController extends AppBaseController
      *      tags={"Customer"},
      *      description="Get all Customers",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function index(Request $request)
     {
@@ -76,6 +81,11 @@ class CustomerAPIController extends AppBaseController
      *      tags={"Customer"},
      *      description="Store Customer",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function store(CreateCustomerAPIRequest $request)
     {
@@ -97,6 +107,11 @@ class CustomerAPIController extends AppBaseController
      *      tags={"Customer"},
      *      description="Get Customer",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function show($id)
     {
@@ -122,6 +137,11 @@ class CustomerAPIController extends AppBaseController
      *      tags={"Customer"},
      *      description="Update Customer",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function update($id, UpdateCustomerAPIRequest $request)
     {
@@ -150,18 +170,11 @@ class CustomerAPIController extends AppBaseController
      *      tags={"Customer"},
      *      description="Delete Customer",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function destroy($id)
     {
-        /** @var Customer $customer */
-        $customer = $this->customerRepository->find($id);
-
-        if (empty($customer)) {
-            return $this->sendError('Customer not found');
-        }
-
-        $customer->delete();
-
-        return $this->sendSuccess('Customer deleted successfully');
-    }
-}

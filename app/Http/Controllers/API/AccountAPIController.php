@@ -36,7 +36,17 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/accounts",
-
+     *      summary="Get a listing of Accounts.",
+     *      tags={"Account"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Account")
+     *          )
+     *      )
+     * )
      */
     public function index(Request $request)
     {
@@ -47,7 +57,7 @@ class AccountAPIController extends AppBaseController
         );
 
         return response()->json($accounts);
-//        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
+        //        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
     }
 
 
@@ -57,7 +67,24 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/accounts/like/{query}",
-
+     *      summary="Search for Accounts by query",
+     *      tags={"Account"},
+     *      @SWG\Parameter(
+     *          name="query",
+     *          in="path",
+     *          description="Search query",
+     *          required=true,
+     *          type="string"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Account")
+     *          )
+     *      )
+     * )
      */
     public function like(Request $request)
     {
@@ -69,7 +96,7 @@ class AccountAPIController extends AppBaseController
         );
 
         return response()->json($accounts);
-//        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
+        //        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
     }
 
 
@@ -78,13 +105,13 @@ class AccountAPIController extends AppBaseController
 
         $mail = $request->get('email');
         $user = User::firstWhere('email', $mail);
-        if ($user){
-            return $this->sendError('mail.already.taken',401);
+        if ($user) {
+            return $this->sendError('mail.already.taken', 401);
         } else {
             return $this->sendResponse(true, 'mail.available');
         }
 
-//        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
+        //        return $this->sendResponse($accounts->toArray(), 'Accounts retrieved successfully');
     }
 
 
@@ -95,7 +122,14 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Post(
      *      path="/accounts",
-
+     *      summary="Store a newly created Account in storage",
+     *      tags={"Account"},
+     *      @SWG\Response(
+     *          response=201,
+     *          description="Account created successfully",
+     *          @SWG\Schema(ref="#/definitions/Account")
+     *      )
+     * )
      */
     public function store(CreateAccountAPIRequest $request)
     {
@@ -104,7 +138,7 @@ class AccountAPIController extends AppBaseController
         $account = $this->accountRepository->create($input);
 
         return response()->json($account);
-//        return $this->sendResponse($account->toArray(), 'Account saved successfully');
+        //        return $this->sendResponse($account->toArray(), 'Account saved successfully');
     }
 
 
@@ -113,8 +147,15 @@ class AccountAPIController extends AppBaseController
      * @return Response
      *
      * @SWG\Post(
-     *      path="/accounts",
-
+     *      path="/register",
+     *      summary="Register a new user account",
+     *      tags={"Account"},
+     *      @SWG\Response(
+     *          response=201,
+     *          description="User registered successfully",
+     *          @SWG\Schema(ref="#/definitions/Account")
+     *      )
+     * )
      */
 
     public function register(CreateAccountAPIRequest $request)
@@ -129,7 +170,7 @@ class AccountAPIController extends AppBaseController
             'email' => $input['user']['email'],
             'password' => Hash::make($input['user']['password']),
             'logins' => 0,
-            ]);
+        ]);
 
         $input['user_id'] = $user->id;
 
@@ -138,7 +179,7 @@ class AccountAPIController extends AppBaseController
         //Send email
 
         return response()->json($account);
-//        return $this->sendResponse($account->toArray(), 'Account saved successfully');
+        //        return $this->sendResponse($account->toArray(), 'Account saved successfully');
     }
 
     /**
@@ -147,6 +188,25 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/accounts/{id}",
+     *      tags={"Account"},
+     *      description="Display the specified Account",
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Account",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="data", ref="#/definitions/Account"),
+     *              @SWG\Property(property="message", type="string")
+     *          )
+     *      )
      * )
      */
     public function show($id)
@@ -158,7 +218,7 @@ class AccountAPIController extends AppBaseController
             return $this->sendError('Account not found');
         }
         return response()->json($account);
-//        return $this->sendResponse($account->toArray(), 'Account retrieved successfully');
+        //        return $this->sendResponse($account->toArray(), 'Account retrieved successfully');
     }
 
 
@@ -190,7 +250,6 @@ class AccountAPIController extends AppBaseController
         $user->authorities = $authorities;
         $account->entity;
         return response()->json($user, 200);
-
     }
 
     /**
@@ -200,6 +259,22 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Put(
      *      path="/accounts/{id}",
+     *      tags={"Account"},
+     *      summary="Update the specified Account in storage",
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Account id",
+     *          required=true,
+     *          type="integer"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Account updated successfully",
+     *          @SWG\Schema(ref="#/definitions/Account")
+     *      ),
+     *      @SWG\Response(response=404, description="Account not found")
+     * )
      */
     public function update($id, UpdateAccountAPIRequest $request)
     {
@@ -214,7 +289,7 @@ class AccountAPIController extends AppBaseController
 
         $account = $this->accountRepository->update($input, $id);
         return response()->json($account);
-//        return $this->sendResponse($account->toArray(), 'Account updated successfully');
+        //        return $this->sendResponse($account->toArray(), 'Account updated successfully');
     }
 
     /**
@@ -223,6 +298,18 @@ class AccountAPIController extends AppBaseController
      *
      * @SWG\Delete(
      *      path="/accounts/{id}",
+     *      tags={"Account"},
+     *      summary="Remove the specified Account from storage",
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Account id",
+     *          required=true,
+     *          type="integer"
+     *      ),
+     *      @SWG\Response(response=200, description="Account deleted successfully"),
+     *      @SWG\Response(response=404, description="Account not found")
+     * )
      */
     public function destroy($id)
     {
@@ -236,38 +323,5 @@ class AccountAPIController extends AppBaseController
         $account->delete();
 
         return $this->sendSuccess('Account deleted successfully');
-    }
-
-
-
-    public function updateImage(Request $request)
-    {
-
-        $input = $request->all();
-
-        $account = $this->accountRepository->find($input['account_id']);
-
-        if (empty($account)) {
-            return $this->sendError('Account not found');
-        }
-
-        if ($request->hasFile('image'))
-        {
-            $date = time();
-            $image      = $request->file('image');
-            $filename  = $date .'_'. $image->getClientOriginalName() ;
-            $extension = $image->getClientOriginalExtension();
-
-            $path = $request->file('image')->storePubliclyAs(
-                'images/accounts',
-                $filename,
-                'local');
-            $account->image_url = url($path);
-
-            $account = $this->accountRepository->update($account->toArray(), $account->id);
-            return response()->json($account);
-        } else {
-            return response()->json($account,404);
-        }
     }
 }

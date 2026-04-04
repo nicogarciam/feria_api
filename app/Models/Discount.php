@@ -9,7 +9,67 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @SWG\Definition(
  *      definition="Discount",
-
+ *      required={"store_id", "date_from", "date_to", "description", "discount"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Discount id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="store_id",
+ *          description="Store id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_from",
+ *          description="Discount start date",
+ *          type="string",
+ *          format="date"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_to",
+ *          description="Discount end date",
+ *          type="string",
+ *          format="date"
+ *      ),
+ *      @SWG\Property(
+ *          property="description",
+ *          description="Discount description",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="limit_discount",
+ *          description="Limit discount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="category_id",
+ *          description="Category id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="product_id",
+ *          description="Product id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="discount",
+ *          description="Discount amount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="active",
+ *          description="Active flag",
+ *          type="boolean"
+ *      )
+ * )
  */
 class Discount extends Model
 {
@@ -71,6 +131,4 @@ class Discount extends Model
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'
     ];
-
-
 }

@@ -268,15 +268,3 @@ class PaymentItemAPIController extends AppBaseController
      */
     public function destroy($id)
     {
-        /** @var PaymentItem $paymentItem */
-        $paymentItem = $this->paymentItemRepository->find($id);
-
-        if (empty($paymentItem)) {
-            return $this->sendError('Payment Item not found');
-        }
-
-        $paymentItem->delete();
-
-        return $this->sendSuccess('Payment Item deleted successfully');
-    }
-}

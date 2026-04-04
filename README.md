@@ -34,6 +34,23 @@ https://jwt-auth.readthedocs.io/en/develop/auth-guard/
 
 
 
+## Swagger API documentation
+
+Swagger UI is available when the application is running at:
+
+- `http://127.0.0.1:8000/api/docs` (when using `php artisan serve`)
+- `http://localhost/feria_api/public/api/docs` (when using WAMP and the project is served from `feria_api/public`)
+
+The generated Swagger JSON file is stored at `storage/docs/api-docs.json`.
+
+The route is configured in `config/swaggervel.php`:
+
+- `api-docs-route` => `/api/docs`
+- `doc-dir` => `storage/docs`
+- `auto-generate` => `true`
+
+If the UI does not load, make sure the Laravel server is running and refresh the page.
+
 ## My Sql Cron
 
 CREATE EVENT `eCreateFeeForAll` ON SCHEDULE EVERY 1 MONTH STARTS '2021-07-01 00:00:00'

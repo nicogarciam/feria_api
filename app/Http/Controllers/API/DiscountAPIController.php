@@ -32,7 +32,17 @@ class DiscountAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/discounts",
-
+     *      summary="Get a listing of Discounts.",
+     *      tags={"Discount"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Discount")
+     *          )
+     *      )
+     * )
      */
     public function index(Request $request)
     {
@@ -43,7 +53,7 @@ class DiscountAPIController extends AppBaseController
         );
 
         return response()->json($discounts);
-//        return $this->sendResponse(DiscountResource::collection($discounts), 'Discounts retrieved successfully');
+        //        return $this->sendResponse(DiscountResource::collection($discounts), 'Discounts retrieved successfully');
     }
 
     /**
@@ -55,7 +65,12 @@ class DiscountAPIController extends AppBaseController
      *      summary="Store a newly created Discount in storage",
      *      tags={"Discount"},
      *      description="Store Discount",
-
+     *      @SWG\Response(
+     *          response=201,
+     *          description="Discount created successfully",
+     *          @SWG\Schema(ref="#/definitions/Discount")
+     *      )
+     * )
      */
     public function store(CreateDiscountAPIRequest $request)
     {
@@ -64,7 +79,7 @@ class DiscountAPIController extends AppBaseController
         $discount = $this->discountRepository->create($input);
 
         return response()->json($discount);
-//        return $this->sendResponse(new DiscountResource($discount), 'Discount saved successfully');
+        //        return $this->sendResponse(new DiscountResource($discount), 'Discount saved successfully');
     }
 
     /**
@@ -74,7 +89,21 @@ class DiscountAPIController extends AppBaseController
      * @SWG\Get(
      *      path="/discounts/{id}",
      *      summary="Display the specified Discount",
-
+     *      tags={"Discount"},
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Discount id",
+     *          required=true,
+     *          type="integer"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(ref="#/definitions/Discount")
+     *      ),
+     *      @SWG\Response(response=404, description="Discount not found")
+     * )
      */
     public function show($id)
     {
@@ -86,7 +115,7 @@ class DiscountAPIController extends AppBaseController
         }
 
         return response()->json($discount);
-//        return $this->sendResponse(new DiscountResource($discount), 'Discount retrieved successfully');
+        //        return $this->sendResponse(new DiscountResource($discount), 'Discount retrieved successfully');
     }
 
     /**
@@ -97,7 +126,21 @@ class DiscountAPIController extends AppBaseController
      * @SWG\Put(
      *      path="/discounts/{id}",
      *      summary="Update the specified Discount in storage",
-
+     *      tags={"Discount"},
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Discount id",
+     *          required=true,
+     *          type="integer"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Discount updated successfully",
+     *          @SWG\Schema(ref="#/definitions/Discount")
+     *      ),
+     *      @SWG\Response(response=404, description="Discount not found")
+     * )
      */
     public function update($id, UpdateDiscountAPIRequest $request)
     {
@@ -113,7 +156,7 @@ class DiscountAPIController extends AppBaseController
         $discount = $this->discountRepository->update($input, $id);
 
         return response()->json($discount);
-//        return $this->sendResponse(new DiscountResource($discount), 'Discount updated successfully');
+        //        return $this->sendResponse(new DiscountResource($discount), 'Discount updated successfully');
     }
 
     /**
@@ -126,7 +169,15 @@ class DiscountAPIController extends AppBaseController
      *      tags={"Discount"},
      *      description="Delete Discount",
      *      produces={"application/json"},
-
+     *      @SWG\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Discount id",
+     *          required=true,
+     *          type="integer"
+     *      ),
+     *      @SWG\Response(response=200, description="Discount deleted successfully")
+     * )
      */
     public function destroy($id)
     {

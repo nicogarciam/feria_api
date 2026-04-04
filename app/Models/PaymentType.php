@@ -8,80 +8,58 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @SWG\Definition(
- *      definition="Category",
+ *      definition="PaymentType",
  *      required={"name"},
  *
  *      @SWG\Property(
  *          property="id",
- *          description="Category id",
+ *          description="Payment type id",
  *          type="integer",
  *          format="int32"
  *      ),
  *      @SWG\Property(
  *          property="name",
- *          description="Category name",
+ *          description="Payment type name",
  *          type="string"
  *      ),
  *      @SWG\Property(
  *          property="description",
- *          description="Category description",
+ *          description="Payment type description",
  *          type="string"
  *      ),
  *      @SWG\Property(
- *          property="category_id",
- *          description="Parent category id",
- *          type="integer",
- *          format="int32"
- *      ),
- *      @SWG\Property(
- *          property="color",
- *          description="Category color",
+ *          property="active",
+ *          description="Payment type active flag",
  *          type="string"
  *      )
  * )
  */
-class Category extends Model
+class PaymentType extends Model
 {
     use SoftDeletes;
 
     use HasFactory;
 
-    public $table = 'categories';
-
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
+    public $table = 'payment_types';
 
     protected $dates = ['deleted_at'];
-
 
     public $fillable = [
         'name',
         'description',
-        'category_id',
-        'color',
+        'active'
     ];
 
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'name' => 'string',
-        'color' => 'string',
+        'description' => 'string',
+        'active' => 'string'
     ];
 
-    /**
-     * Validation rules
-     *
-     * @var array
-     */
     public static $rules = [
-        'name' => 'required|string|max:255',
+        'name' => 'required',
         'created_at' => 'nullable',
-        'updated_at' => 'nullable',
-        'deleted_at' => 'nullable'
+        'updated_at' => 'nullable'
     ];
 }

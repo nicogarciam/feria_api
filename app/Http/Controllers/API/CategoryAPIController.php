@@ -34,7 +34,15 @@ class CategoryAPIController extends AppBaseController
      * @SWG\Get(
      *      path="/accommodationTypes",
      *      summary="Get a listing of the AccommodationTypes.",
-
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Category")
+     *          )
+     *      )
+     * )
      */
     public function index(Request $request)
     {
@@ -70,7 +78,18 @@ class CategoryAPIController extends AppBaseController
      *
      * @SWG\Post(
      *      path="/accommodationTypes",
-
+     *      summary="Store a newly created AccommodationType in storage",
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="data", ref="#/definitions/Category"),
+     *              @SWG\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
      */
     public function store(CreateAccommodationTypeAPIRequest $request)
     {
@@ -87,7 +106,25 @@ class CategoryAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/accommodationTypes/{id}",
-     *      summary="Display the specified Category",
+     *      tags={"AccommodationType"},
+     *      description="Display the specified Category",
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Category",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="data", ref="#/definitions/Category"),
+     *              @SWG\Property(property="message", type="string")
+     *          )
+     *      )
      * )
      */
     public function show($id)
@@ -111,7 +148,24 @@ class CategoryAPIController extends AppBaseController
      * @SWG\Put(
      *      path="/accommodationTypes/{id}",
      *      summary="Update the specified Category in storage",
-
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Category",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="data", ref="#/definitions/Category"),
+     *              @SWG\Property(property="message", type="string")
+     *          )
+     *      )
+     * )
      */
     public function update($id, UpdateAccommodationTypeAPIRequest $request)
     {
@@ -137,20 +191,23 @@ class CategoryAPIController extends AppBaseController
      * @SWG\Delete(
      *      path="/accommodationTypes/{id}",
      *      summary="Remove the specified Category from storage",
-
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Category",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="message", type="string")
+     *          )
+     *      )
      * )
      */
     public function destroy($id)
     {
-        /** @var Category $accommodationType */
-        $accommodationType = $this->categoryRepository->find($id);
-
-        if (empty($accommodationType)) {
-            return $this->sendError('Accommodation Type not found');
-        }
-
-        $accommodationType->delete();
-
-        return $this->sendSuccess('Accommodation Type deleted successfully');
-    }
-}

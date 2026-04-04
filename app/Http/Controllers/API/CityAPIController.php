@@ -34,6 +34,11 @@ class CityAPIController extends AppBaseController
      *      path="/cities",
      *      summary="Get a listing of the Cities.",
 
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function index(Request $request)
     {
@@ -55,6 +60,11 @@ class CityAPIController extends AppBaseController
      *      path="/cities",
      *      summary="Store a newly created City in storage",
 
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function store(CreateCityAPIRequest $request)
     {
@@ -73,6 +83,11 @@ class CityAPIController extends AppBaseController
      * @SWG\Get(
      *      path="/cities/{id}",
      *      summary="Display the specified City",
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function show($id)
     {
@@ -96,6 +111,11 @@ class CityAPIController extends AppBaseController
      *      path="/cities/{id}",
      *      summary="Update the specified City in storage",
 
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function update($id, UpdateCityAPIRequest $request)
     {
@@ -122,19 +142,11 @@ class CityAPIController extends AppBaseController
      *      path="/cities/{id}",
      *      summary="Remove the specified City from storage",
 
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function destroy($id)
     {
-        /** @var City $city */
-        $city = $this->cityRepository->find($id);
-
-        if (empty($city)) {
-            return $this->sendError('City not found');
-        }
-
-        $city->delete();
-
-
-        return $this->sendSuccess('City deleted successfully');
-    }
-}
