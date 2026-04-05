@@ -150,3 +150,16 @@ class CityAPIController extends AppBaseController
      */
     public function destroy($id)
     {
+        /** @var City $city */
+        $city = $this->cityRepository->find($id);
+
+        if (empty($city)) {
+            return $this->sendError('City not found');
+        }
+
+        $city->delete();
+
+
+        return $this->sendSuccess('City deleted successfully');
+    }
+}

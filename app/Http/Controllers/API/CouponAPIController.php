@@ -154,3 +154,15 @@ class CouponAPIController extends AppBaseController
      */
     public function destroy($id)
     {
+        /** @var Coupon $coupon */
+        $coupon = $this->couponRepository->find($id);
+
+        if (empty($coupon)) {
+            return $this->sendError('Coupon not found');
+        }
+
+        $coupon->delete();
+
+        return $this->sendSuccess('Coupon deleted successfully');
+    }
+}

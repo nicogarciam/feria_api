@@ -268,3 +268,15 @@ class PaymentStateAPIController extends AppBaseController
      */
     public function destroy($id)
     {
+        /** @var PaymentState $paymentState */
+        $paymentState = $this->paymentStateRepository->find($id);
+
+        if (empty($paymentState)) {
+            return $this->sendError('Payment State not found');
+        }
+
+        $paymentState->delete();
+
+        return $this->sendSuccess('Payment State deleted successfully');
+    }
+    }

@@ -4,7 +4,7 @@
         "title": "Laravel Generator APIs",
         "version": "1.0.0"
     },
-    "basePath": "/api/v1",
+    "basePath": "/api",
     "paths": {
         "/accounts": {
             "get": {
@@ -168,131 +168,165 @@
                 }
             }
         },
-        "/accommodationTypes": {
-            "get": {
-                "summary": "Get a listing of the AccommodationTypes.",
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
+        "/auth/authenticate": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User credentials",
+                        "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/Category"
-                            }
+                            "$ref": "#/definitions/LoginRequest"
                         }
                     }
-                }
-            },
-            "post": {
-                "summary": "Store a newly created AccommodationType in storage",
+                ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Successful login",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Category"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/AuthResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Bad credentials"
                     }
                 }
             }
         },
-        "/accommodationTypes/{id}": {
+        "/auth/google_signin": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google sign-in",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Google credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/GoogleSignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Google login",
+                        "schema": {
+                            "$ref": "#/definitions/AuthResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Bad Google credentials"
+                    }
+                }
+            }
+        },
+        "/auth/account": {
             "get": {
                 "tags": [
-                    "AccommodationType"
+                    "Authentication"
                 ],
-                "description": "Display the specified Category",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Category",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
+                "summary": "Get authenticated user information",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User logout",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
                         "schema": {
                             "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Category"
-                                },
                                 "message": {
-                                    "type": "string"
+                                    "description": "Log the user out (Invalidate the token).",
+                                    "type": "string",
+                                    "example": "Successfully logged out"
                                 }
                             },
                             "type": "object"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
-            },
-            "put": {
-                "summary": "Update the specified Category in storage",
-                "parameters": [
+                },
+                "security": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Category",
-                        "required": true,
-                        "type": "integer"
+                        "jwt": []
                     }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Refresh authentication token",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Token refreshed successfully",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Category"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/AuthResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
-            },
-            "delete": {
-                "summary": "Remove the specified Category from storage",
-                "parameters": [
+                },
+                "security": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Category",
-                        "required": true,
-                        "type": "integer"
+                        "jwt": []
                     }
+                ]
+            }
+        },
+        "/auth/test": {
+            "get": {
+                "tags": [
+                    "Authentication"
                 ],
+                "summary": "Test API endpoint",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Successful operation",
                         "schema": {
                             "properties": {
-                                "success": {
-                                    "type": "boolean"
+                                "status": {
+                                    "description": "Test endpoint.",
+                                    "type": "string",
+                                    "example": "ok"
                                 },
-                                "message": {
-                                    "type": "string"
+                                "msg": {
+                                    "description": "Test endpoint.",
+                                    "type": "string",
+                                    "example": "Welcome to ALOJAR API"
                                 }
                             },
                             "type": "object"
@@ -601,6 +635,411 @@
                         "description": "Discount deleted successfully"
                     }
                 }
+            }
+        },
+        "/images/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Delete an image",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image deleted successfully"
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/product/{productId}/upload": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload images for a product",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Array of base64 encoded images",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "images": {
+                                    "description": "Upload images for a product.",
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "src": {
+                                                "description": "Base64 encoded image data URI",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Images uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "success": {
+                                    "description": "Upload images for a product.",
+                                    "type": "boolean"
+                                },
+                                "message": {
+                                    "description": "Upload images for a product.",
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "description": "Upload images for a product.",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Image"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "Error uploading images"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/product/{productId}/delete": {
+            "delete": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Delete all images for a product",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Images deleted successfully"
+                    },
+                    "404": {
+                        "description": "No images found for product"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/upload": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload a single image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "in": "formData",
+                        "description": "Image file to upload",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "formData",
+                        "description": "Associated product ID",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                },
+                                "src": {
+                                    "description": "Image source URL",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "No image file provided"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/{id}/suggest_price": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Get AI-based price suggestion for an image",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Price suggestion retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/PriceSuggestion"
+                        }
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "422": {
+                        "description": "Could not extract features for the image"
+                    },
+                    "500": {
+                        "description": "Error processing price suggestion"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/{id}/extract_features": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Extract features from an image using AI",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image features extracted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ImageFeatures"
+                        }
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "500": {
+                        "description": "Failed to extract image features"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/upload_general": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload a general image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "in": "formData",
+                        "description": "Image file to upload (jpeg, png, jpg, gif, svg)",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "No image file uploaded"
+                    },
+                    "415": {
+                        "description": "Invalid image type"
+                    },
+                    "500": {
+                        "description": "Failed to save image"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/set_primary": {
+            "put": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Set an image as primary",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Image data",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "id"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                },
+                                "src": {
+                                    "description": "Image source path",
+                                    "type": "string"
+                                },
+                                "benefit_id": {
+                                    "description": "Benefit ID",
+                                    "type": "integer"
+                                },
+                                "store_id": {
+                                    "description": "Store ID",
+                                    "type": "integer"
+                                },
+                                "activity_id": {
+                                    "description": "Activity ID",
+                                    "type": "integer"
+                                },
+                                "event_id": {
+                                    "description": "Event ID",
+                                    "type": "integer"
+                                },
+                                "entity_id": {
+                                    "description": "Entity ID",
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image set as primary successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Image"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
             }
         },
         "/paymentItems": {
@@ -1001,6 +1440,278 @@
                 }
             }
         },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get a listing of all Products",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Store a newly created Product",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Product data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Display the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Product data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Remove the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product deleted successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/store/{storeId}/products/{type}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Find products for a specific store",
+                "parameters": [
+                    {
+                        "name": "storeId",
+                        "in": "path",
+                        "description": "Store ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Product type filter",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized store access"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/sales/{saleId}/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Find products for a specific sale",
+                "parameters": [
+                    {
+                        "name": "saleId",
+                        "in": "path",
+                        "description": "Sale ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sale not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
         "/sales": {
             "get": {
                 "tags": [
@@ -1135,6 +1846,370 @@
         }
     },
     "definitions": {
+        "LoginRequest": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "description": "User email address",
+                    "type": "string",
+                    "format": "email"
+                },
+                "password": {
+                    "description": "User password",
+                    "type": "string",
+                    "format": "password"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleSignInRequest": {
+            "required": [
+                "credential"
+            ],
+            "properties": {
+                "credential": {
+                    "description": "Google JWT credential",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuthResponse": {
+            "properties": {
+                "token": {
+                    "description": "JWT access token",
+                    "type": "string"
+                },
+                "token_type": {
+                    "description": "Token type",
+                    "type": "string",
+                    "example": "bearer"
+                },
+                "expires_in": {
+                    "description": "Token expiration time in seconds",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "Class AuthController",
+                    "properties": {
+                        "id": {
+                            "description": "Class AuthController",
+                            "type": "integer"
+                        },
+                        "name": {
+                            "description": "Class AuthController",
+                            "type": "string"
+                        },
+                        "email": {
+                            "description": "Class AuthController",
+                            "type": "string"
+                        },
+                        "logins": {
+                            "description": "Class AuthController",
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "User": {
+            "properties": {
+                "id": {
+                    "description": "User ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "User name",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "User email",
+                    "type": "string",
+                    "format": "email"
+                },
+                "google_id": {
+                    "description": "Google user ID",
+                    "type": "string"
+                },
+                "picture": {
+                    "description": "User profile picture URL",
+                    "type": "string"
+                },
+                "logins": {
+                    "description": "Login count",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Class AuthController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class AuthController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object"
+        },
+        "Image": {
+            "properties": {
+                "id": {
+                    "description": "Image ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "src": {
+                    "description": "Image source path",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Image title",
+                    "type": "string"
+                },
+                "product_id": {
+                    "description": "Associated product ID",
+                    "type": "integer"
+                },
+                "benefit_id": {
+                    "description": "Associated benefit ID",
+                    "type": "integer"
+                },
+                "store_id": {
+                    "description": "Associated store ID",
+                    "type": "integer"
+                },
+                "activity_id": {
+                    "description": "Associated activity ID",
+                    "type": "integer"
+                },
+                "event_id": {
+                    "description": "Associated event ID",
+                    "type": "integer"
+                },
+                "primary": {
+                    "description": "Is primary image (0 or 1)",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Class ImageAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ImageAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Image"
+            }
+        },
+        "ImageFeatures": {
+            "properties": {
+                "brand": {
+                    "description": "Detected brand",
+                    "type": "string"
+                },
+                "model": {
+                    "description": "Detected model",
+                    "type": "string"
+                },
+                "color": {
+                    "description": "Detected color",
+                    "type": "string"
+                },
+                "condition": {
+                    "description": "Detected condition",
+                    "type": "string"
+                },
+                "category": {
+                    "description": "Detected category",
+                    "type": "string"
+                },
+                "confidence": {
+                    "description": "Confidence score",
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object"
+        },
+        "PriceSuggestion": {
+            "properties": {
+                "min_price": {
+                    "description": "Minimum suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "max_price": {
+                    "description": "Maximum suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "avg_price": {
+                    "description": "Average suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "currency": {
+                    "description": "Currency code",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Product": {
+            "properties": {
+                "id": {
+                    "description": "Product ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "code": {
+                    "description": "Product code",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Product title",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Product description",
+                    "type": "string"
+                },
+                "store_id": {
+                    "description": "Store ID",
+                    "type": "integer"
+                },
+                "provider_id": {
+                    "description": "Provider ID",
+                    "type": "integer"
+                },
+                "category_id": {
+                    "description": "Category ID",
+                    "type": "integer"
+                },
+                "state_id": {
+                    "description": "Product state ID",
+                    "type": "integer"
+                },
+                "color": {
+                    "description": "Product color",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Product size",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "Product price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "cost": {
+                    "description": "Product cost",
+                    "type": "number",
+                    "format": "float"
+                },
+                "fee": {
+                    "description": "Product fee",
+                    "type": "number",
+                    "format": "float"
+                },
+                "created_at": {
+                    "description": "Class ProductAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ProductAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Product"
+            }
+        },
+        "ProductRequest": {
+            "required": [
+                "code",
+                "store_id"
+            ],
+            "properties": {
+                "code": {
+                    "description": "Product code",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Product title",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Product description",
+                    "type": "string"
+                },
+                "store_id": {
+                    "description": "Store ID",
+                    "type": "integer"
+                },
+                "provider_id": {
+                    "description": "Provider ID",
+                    "type": "integer"
+                },
+                "category_id": {
+                    "description": "Category ID",
+                    "type": "integer"
+                },
+                "state_id": {
+                    "description": "Product state ID",
+                    "type": "integer"
+                },
+                "color": {
+                    "description": "Product color",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Product size",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "Product price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "cost": {
+                    "description": "Product cost",
+                    "type": "number",
+                    "format": "float"
+                },
+                "fee": {
+                    "description": "Product fee",
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "ProductRequest"
+            }
+        },
         "Account": {
             "required": [
                 "first_name",

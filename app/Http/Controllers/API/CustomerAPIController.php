@@ -178,3 +178,15 @@ class CustomerAPIController extends AppBaseController
      */
     public function destroy($id)
     {
+        /** @var Customer $customer */
+        $customer = $this->customerRepository->find($id);
+
+        if (empty($customer)) {
+            return $this->sendError('Customer not found');
+        }
+
+        $customer->delete();
+
+        return $this->sendSuccess('Customer deleted successfully');
+    }
+}

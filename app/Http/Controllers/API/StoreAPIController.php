@@ -222,4 +222,89 @@ class StoreAPIController extends AppBaseController
         if (!$valid) {
             return $this->sendError('unauthorized.store','403');
         }
+        /** @var Store $store */
+        $store = $this->storeRepository->find($id);
+
+
+
+        if (empty($store)) {
+            return $this->sendError('Store not found');
+        }
+
+        $store->delete();
+
+        return $this->sendSuccess('Store deleted successfully');
+    }
+
+
+    public function myStores()
+    {
+        $user = Auth::user();
+        $myStores = $user->myStores();
+        session()->put('stores', $myStores);
+
+        if (empty($myStores)) {
+            return $this->sendError('Entity not found');
+        }
+
+        return response()->json($myStores);
+    }
+
+    public function selectStore($id)
+    {
+        /** @var Store $store */
+//        $stores = session('stores');
+
+        $valid = DataAccessValidation::validateStore($id);
+
+        if (!$valid) {
+            return $this->sendError('unauthorized.store','403');
+        }
+
+        $store = $this->storeRepository->find($id);
+
+        if (empty($store)) {
+            return $this->sendError('Store not found');
+        }
+
+        session(['store_id' => $id]);
+        return response()->json($store);
+//        return $this->sendResponse(new StoreResource($store), 'Store retrieved successfully');
+    }
+
+
+    public function updateLogo(Request $request)
+    {
+
+        $input = $request->all();
+
+        $store = $this->storeRepository->find($input['store_id']);
+
+        if (empty($store)) {
+            return $this->sendError('Entity not found');
+        }
+
+        if ($request->hasFile('logo'))
+        {
+            $logo      = $request->file('logo');
+            $filename  = $logo->getClientOriginalName() . '_' . $store->id;
+            $extension = $logo->getClientOriginalExtension();
+            $uploadPath = "public/images/logos";
+
+            $path = $request->file('logo')->storePubliclyAs(
+                'images/logos',
+                $store->id.'_'. $store->name .'_logo'.'.'.$extension,
+                'local');
+            $store->logo = url($path);
+
+            $store = $this->storeRepository->update($store->toArray(), $store->id);
+            $store->city();
+            return response()->json($store);
+        } else {
+            return response()->json($store,404);
+        }
+    }
+
+
+}
 
