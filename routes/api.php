@@ -77,7 +77,7 @@ Route::group([
     Route::post('images/{id}/extract_features','App\Http\Controllers\API\ImageAPIController@extractFeatures');
     Route::post('images/{id}/suggest_price', 'App\Http\Controllers\API\ImageAPIController@suggestPrice'); // New route
     Route::delete('images/delete/{id}','App\Http\Controllers\API\ImageAPIController@delete');
-    Route::put('images/set_primary','App\Http\Controllers\API\ImageAPIController@set_primary');
+    Route::post('images/set_primary','App\Http\Controllers\API\ImageAPIController@set_primary');
 
 
     Route::get('sales/resume', [SaleAPIController::class,'countResume']);

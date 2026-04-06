@@ -53,6 +53,25 @@ class ProductRepository extends BaseRepository
         return Product::class;
     }
 
+    public function full($id)
+    {
+
+        $query = $this->model->newQuery();
+        $withs = ['category','state','provider','images'];
+
+        if (count($withs)) {
+            foreach($withs as $value) {
+                $query->with($value);
+            }
+        }
+
+        $query->where('id', $id);
+
+        // $query->select('products.*', 'sale_items.id as item_id', 'sale_items.price as item_price');
+
+        return $query->get();
+    }
+
     public function forSaleFull($saleId)
     {
 

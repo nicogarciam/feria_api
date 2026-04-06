@@ -8,6 +8,7 @@ use App\Models\Entity;
 use App\Models\Image;
 use App\Models\Product;
 use App\Services\AIService;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -57,8 +58,10 @@ use Response;
 class ImageAPIController extends AppBaseController
 {
 
-    public function __construct()
+    private $imageService;
+    public function __construct(ImageService $service)
     {
+        $this->imageService = $service;
     }
 
     /**
@@ -95,11 +98,15 @@ class ImageAPIController extends AppBaseController
      */
     public function delete($id)
     {
-
-        $resp = DB::table('images')->where('id','=', $id)->delete();
-
-        if (!$resp) {
+        $image = Image::find($id);
+        if (!$image) {
             return $this->sendError('Image not found');
+        }
+        $resp = $image->delete();
+
+        // Eliminar el archivo físico
+        if (Storage::disk('public')->exists($image->src)) {
+            Storage::disk('public')->delete($image->src);
         }
 
         return $this->sendSuccess('Image deleted successfully');
@@ -329,35 +336,26 @@ class ImageAPIController extends AppBaseController
      *      )
      * )
      */
-    public function uploadImage(Request $request)
+    public function uploadImage(Request $request, $type = 'products')
     {
 
         $input = $request->all();
 
         if ($request->hasFile('image')) {
-            $date = time();
             $image = $request->file('image');
-            $filename = $date . '_' . $image->getClientOriginalName();
-            $extension = $image->getClientOriginalExtension();
+            $filename = $image->getClientOriginalName();
 
-            $filename = $this->sanitize($filename);
-
-            $path = $request->file('image')->storePubliclyAs(
-                'images/uploads',
-                $filename,
-                'local');
-//            $account->image_url = url($path);
-
-//            $account = $this->accountRepository->update($account->toArray(), $account->id);
+            $path = $this->imageService->upload($request->file('image'), $type);
 
             $newImage = [
+                'primary' => $input['primary'] ?? null,
                 'title' => $filename,
-                'src' => url($path),
+                'src' => $path,
                 'product_id' => $input['product_id'] ?? null,
                 'store_id' => $input['store_id'] ?? null,
             ];
 
-            $resp['src'] = url($path);
+            $resp['src'] = $path;
             $resp['id'] = DB::table('images')->insertGetId($newImage);
 
             return response()->json($resp);
@@ -646,50 +644,20 @@ class ImageAPIController extends AppBaseController
     public function set_primary(Request $request){
 
         $img = $request->all();
-        Image::where('benefit_id', $img['benefit_id'])
-            ->where('store_id', $img['store_id'])
-            ->where('activity_id', $img['activity_id'])
-            ->where('event_id', $img['event_id'])
+
+        Image::where('product_id', $img['product_id'])
             ->update(['primary' => 0]);
 
         Image::where('id', $img['id'])
             ->update(['primary' => 1]);
-
-        if ($img['benefit_id'] != null){
-
-            Benefit::where('id', $img['benefit_id'])
-                ->update(['image_url' => $img['src']]);
-            $images = Image::where('benefit_id',$img['benefit_id'])->get();
-            return response()->json($images);
-
-        }
-
-
-        if ($img['store_id'] != null){
-            Entity::where('id', $img['entity_id'])
-                ->update(['image_url' => $img['src']]);
-            $images = Image::where('en',$img['store_id'])->get();
-            return response()->json($images);
-        }
-//        if ($img['activity_id'] != null){
-//            Activity::where('id', $img['activity_id'])
-//                ->update(['image_url' => $img['src']]);
-//        }
-//        if ($img['event_id'] != null){
-//            Event::where('id', $img['event_id'])
-//                ->update(['image_url' => $img['src']]);
-//        }
-
-
-
-
+        return $this->sendResponse($img, 'Image set as primary successfully.');
     }
 
 
     function sanitize($string = '', $is_filename = FALSE)
     {
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-' . ($is_filename ? '~_\.' : '') . ']+/u', '-', $string);
+        $string = preg_replace('/[^\w\-' . ($is_filename ? '~_' : '') . ']+/u', '-', $string);
 
         // Only allow one dash separator at a time (and make string lowercase)
         return mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');

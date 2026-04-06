@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Http\Requests\API\UpdateProductAPIRequest;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Repositories\ProductRepository;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Response;
 use Facades\App\Services\DataAccessValidation;
 
@@ -211,13 +213,13 @@ class ProductAPIController extends AppBaseController
      */
     public function show($id)
     {
-        $product = $this->productRepository->find($id);
+        $product = $this->productRepository->find($id, ['images']);
+        // $product = $this->productRepository->full($id);
 
         if (empty($product)) {
             return $this->sendError('Product not found');
         }
-
-        return $this->sendResponse(new ProductResource($product), 'Product retrieved successfully');
+        return response()->json($product);
     }
 
     /**
@@ -270,9 +272,26 @@ class ProductAPIController extends AppBaseController
         }
 
         $input = $request->all();
+        $newProductImages = $request->file('images');
         $product = $this->productRepository->update($input, $id);
 
-        return $this->sendResponse(new ProductResource($product), 'Product updated successfully');
+        /**
+        * $productImages = Image::where('product_id', $id)->get();
+        * $productImages->each(function ($image) use ($newProductImages) {
+            * if (!$newProductImages->contains($image->id)) {
+                * $filePath = str_replace('storage/', '', $image->src);
+                * // Eliminar el archivo físico
+                * if (Storage::disk('public')->exists($filePath)) {
+                    * Storage::disk('public')->delete($filePath);
+                * }
+                * $image->delete();
+            * }
+        * });
+ *
+* Image::whereIn('product_id', $newProductImages)->update(['product_id' => $id]);
+         */
+        return response()->json($product);
+       // return $this->sendResponse(new ProductResource($product), 'Product updated successfully');
     }
 
     /**
