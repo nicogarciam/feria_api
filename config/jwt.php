@@ -101,7 +101,7 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', 480),
+    'ttl' => env('JWT_TTL', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -147,14 +147,14 @@ return [
     |
     */
 
-    'required_claims' => [
+    'required_claims' => array_values(array_filter([
         'iss',
         'iat',
-        'exp',
+        env('JWT_TTL', null) !== null ? 'exp' : null,
         'nbf',
         'sub',
         'jti',
-    ],
+    ])),
 
     /*
     |--------------------------------------------------------------------------

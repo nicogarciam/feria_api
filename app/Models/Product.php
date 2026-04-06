@@ -17,7 +17,7 @@ class Product extends Model
 
     public $table = 'products';
 
-    public $with = ['category','state'];
+    public $with = ['category','state','provider'];
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
@@ -56,7 +56,6 @@ class Product extends Model
      * @var array
      */
     public static $rules = [
-        'code' => 'required|string',
         'store_id' => 'required|integer',
         'created_at' => 'nullable',
         'updated_at' => 'nullable'

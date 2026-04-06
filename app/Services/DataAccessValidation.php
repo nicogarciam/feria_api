@@ -82,12 +82,16 @@ class DataAccessValidation
 
     public function getCheckStores() {
 
-        if (session()->exists('stores')) {
+        $stores = [];
+        $stores = session()->exists('stores') ? session()->get('stores') : null;
+
+        if ($stores && sizeof($stores) > 0) {
             $stores = session()->get('stores');
         } else {
             $stores = Auth::user()->myStores();
             session()->put('stores', $stores);
         }
+
 
         return $stores->toArray();
     }

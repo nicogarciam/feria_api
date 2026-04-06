@@ -30,7 +30,7 @@ class AccountAPIController extends AppBaseController
     }
 
     /**
-     * 
+     *
      * @param Request $request
      * @return Response
      *
@@ -164,22 +164,31 @@ class AccountAPIController extends AppBaseController
 
         $input['activated'] = false;
 
+        $userData = $input;
+        $fullName = trim($userData['name'] ?? '');
+        $nameParts = preg_split('/\s+/', $fullName, 2);
+        $firstName = $nameParts[0] ?? '';
+        $lastName = $nameParts[1] ?? '';
+
         // create user
         $user = User::create([
-            'name' => $input['user']['username'],
-            'email' => $input['user']['email'],
-            'password' => Hash::make($input['user']['password']),
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'password' => Hash::make($userData['password']),
             'logins' => 0,
         ]);
 
         $input['user_id'] = $user->id;
+        $input['first_name'] = $firstName;
+        $input['last_name'] = $lastName;
+        $input['email'] = $userData['email'];
+
 
         $account = $this->accountRepository->create($input);
 
         //Send email
 
         return response()->json($account);
-        //        return $this->sendResponse($account->toArray(), 'Account saved successfully');
     }
 
     /**
@@ -218,7 +227,6 @@ class AccountAPIController extends AppBaseController
             return $this->sendError('Account not found');
         }
         return response()->json($account);
-        //        return $this->sendResponse($account->toArray(), 'Account retrieved successfully');
     }
 
 

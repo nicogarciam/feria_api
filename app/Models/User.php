@@ -113,7 +113,7 @@ class User extends Authenticatable implements JWTSubject
     {
         $stores = Store::with('city')
             ->Where('stores.owner_id', $this->id)
-            //            ->toSql();
+                        //->toSql();
             ->get();
 
         $this->stores = $stores;

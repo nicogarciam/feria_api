@@ -111,9 +111,27 @@ class ProductAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         );
+        //return response()->json($products);
+        return $this->sendResponse($products, 'Products retrieved successfully');
+    }
+
+    public function query(Request $request)
+     {
+        //($search = [], $skip = null, $limit = null, $withs = [], $sorts = [], $like = null)
+        $products = $this->productRepository->allQueryFull
+        (
+            $request->except(['skip', 'limit','like','withs','sorts']),
+            $request->get('skip'),
+            $request->get('limit'),
+            [],
+            [],
+            $request->get('like')
+
+        );
 
         return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully');
     }
+
 
     /**
      * Store a newly created Product.
@@ -151,6 +169,8 @@ class ProductAPIController extends AppBaseController
     public function store(CreateProductAPIRequest $request)
     {
         $input = $request->all();
+        $input['code'] = $input['code'] ?? strtoupper(substr(uniqid(), 0, 10)) ;
+
         $product = $this->productRepository->create($input);
 
         return $this->sendResponse(new ProductResource($product), 'Product created successfully');

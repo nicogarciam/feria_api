@@ -81,6 +81,7 @@ class StoreAPIController extends AppBaseController
     public function store(CreateStoreAPIRequest $request)
     {
         $input = $request->all();
+        $input['city_id'] = $input['city_id'] ?? 1;
 
         $store = $this->storeRepository->create($input);
 
@@ -143,7 +144,6 @@ class StoreAPIController extends AppBaseController
             return $this->sendError('Store not found');
         }
         return response()->json($store);
-//        return $this->sendResponse(new StoreResource($store), 'Store retrieved successfully');
     }
 
 

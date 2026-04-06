@@ -1712,6 +1712,207 @@
                 ]
             }
         },
+        "/providers": {
+            "get": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Get a listing of all Providers",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "type": "string"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Provider"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Store a newly created Provider in storage",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Provider that should be stored",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/ProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/providers/{id}": {
+            "get": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Display the specified Provider",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Update the specified Provider in storage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Provider that should be updated",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/ProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Remove the specified Provider from storage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "properties": {
+                                "success": {
+                                    "description": "Remove the specified Provider from storage.",
+                                    "type": "boolean"
+                                },
+                                "data": {
+                                    "description": "Remove the specified Provider from storage.",
+                                    "type": "string"
+                                },
+                                "message": {
+                                    "description": "Remove the specified Provider from storage.",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
         "/sales": {
             "get": {
                 "tags": [
@@ -2208,6 +2409,139 @@
             "type": "object",
             "xml": {
                 "name": "ProductRequest"
+            }
+        },
+        "Provider": {
+            "properties": {
+                "id": {
+                    "description": "Provider ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "Provider name",
+                    "type": "string"
+                },
+                "cuil": {
+                    "description": "Provider CUIL",
+                    "type": "string"
+                },
+                "contact_name": {
+                    "description": "Contact name",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Provider email",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "Provider address",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "Provider token",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Provider password",
+                    "type": "string"
+                },
+                "city_id": {
+                    "description": "City ID",
+                    "type": "integer"
+                },
+                "phone": {
+                    "description": "Provider phone",
+                    "type": "string"
+                },
+                "fee": {
+                    "description": "Provider fee",
+                    "type": "integer"
+                },
+                "alias": {
+                    "description": "Provider alias",
+                    "type": "string"
+                },
+                "bank": {
+                    "description": "Provider bank",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "Class ProviderAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ProviderAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Provider"
+            }
+        },
+        "ProviderRequest": {
+            "required": [
+                "name",
+                "email"
+            ],
+            "properties": {
+                "name": {
+                    "description": "Provider name",
+                    "type": "string"
+                },
+                "cuil": {
+                    "description": "Provider CUIL",
+                    "type": "string"
+                },
+                "contact_name": {
+                    "description": "Contact name",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Provider email",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "Provider address",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "Provider token",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Provider password",
+                    "type": "string"
+                },
+                "city_id": {
+                    "description": "City ID",
+                    "type": "integer"
+                },
+                "phone": {
+                    "description": "Provider phone",
+                    "type": "string"
+                },
+                "fee": {
+                    "description": "Provider fee",
+                    "type": "integer"
+                },
+                "alias": {
+                    "description": "Provider alias",
+                    "type": "string"
+                },
+                "bank": {
+                    "description": "Provider bank",
+                    "type": "string"
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "ProviderRequest"
             }
         },
         "Account": {

@@ -350,11 +350,12 @@ class ImageAPIController extends AppBaseController
 
 //            $account = $this->accountRepository->update($account->toArray(), $account->id);
 
-            $newImage = array([
+            $newImage = [
                 'title' => $filename,
                 'src' => url($path),
-                'product_id' => $input['product_id'],
-            ]);
+                'product_id' => $input['product_id'] ?? null,
+                'store_id' => $input['store_id'] ?? null,
+            ];
 
             $resp['src'] = url($path);
             $resp['id'] = DB::table('images')->insertGetId($newImage);

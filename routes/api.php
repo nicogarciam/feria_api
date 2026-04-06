@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\ImageAPIController;
 use App\Http\Controllers\API\MovementAPIController;
 use App\Http\Controllers\API\PaymentAPIController;
@@ -59,16 +60,16 @@ Route::group([
 
     Route::post('accounts/balance',[MovementAPIController::class,'balance']);
 
-    Route::get('store/{storeId}/categories',
-        'App\Http\Controllers\API\CategoryAPIController@findByStore');
+    Route::get('stores/{storeId}/categories', [CategoryAPIController::class,'findByStore']);
 
-    Route::get('store/{storeId}/products',[ProductAPIController::class,'findByStore'] );
+    Route::get('stores/{storeId}/products',[ProductAPIController::class,'findByStore'] );
 
-    Route::get('store/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
+    Route::get('stores/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
 
 
     Route::get('stores/{storeId}/sale_states', [SaleStateAPIController::class,'findByStore'] );
 
+    Route::get('product/query',[ProductAPIController::class,'query'] );
 
     Route::post('images/upload',[ImageAPIController::class, 'uploadImage']);
     Route::post('images/product/{productId}/upload',[ImageAPIController::class, 'uploadProductImage']);
