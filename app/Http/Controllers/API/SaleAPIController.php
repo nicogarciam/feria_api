@@ -16,6 +16,7 @@ use App\Repositories\AccommodationPriceRepository;
 use App\Repositories\SaleRepository;
 use App\Services\BookingService;
 use App\Services\MovementsService;
+use App\Services\PaginationService;
 use App\Services\SaleService;
 use Facades\App\Services\DataAccessValidation;
 use Illuminate\Http\Request;
@@ -77,8 +78,10 @@ class SaleAPIController extends AppBaseController
         $date_from = $request->get('date_from');
         $date_to = $request->get('date_to');
         $storeId = $request->get('store_id');
-        $search = $request->except(['skip','states','limit','date_from','date_to','filter_state']);
+        $search = $request->except(['skip','states','limit','date_from','date_to','filter_state','sort','page','size']);
         $filter = $request->get('filter_state');
+        $q = $request->get('q');
+        $sort = $request->get('sort', 'created_at,desc');
 
         $valid = DataAccessValidation::validateStore($storeId);
 
@@ -86,11 +89,21 @@ class SaleAPIController extends AppBaseController
             return $this->sendError('unauthorized.store','403');
         }
 
+        // Convert sort parameter to array
+        $orders = null;
+        if ($sort) {
+            $sortParts = explode(',', $sort);
+            $orders = [];
+            for ($i = 0; $i < count($sortParts); $i += 2) {
+                if (isset($sortParts[$i + 1])) {
+                    $orders[] = $sortParts[$i] . ',' . $sortParts[$i + 1];
+                }
+            }
+        }
 
-        $sales = $this->saleRepository->allSalesQuery($search, $date_from, $date_to, $storeId);
+        $query = $this->saleRepository->allSalesQueryLikeWithSort($q, $date_from, $date_to, $storeId, $orders);
 
-
-        return response()->json($sales);
+        return PaginationService::forAngular($query, $request);
     }
 
     public function removeProduct($saleId = null, $productId = null)
@@ -176,6 +189,7 @@ class SaleAPIController extends AppBaseController
                 'sale_id' => $sale->id,
                 'product_id'   => $p['id'],
                 'price'   => $p['price'],
+                'status' => $p['status']
             );
 
             DB::table('products')->where('id', $p['id'])->update(
@@ -230,21 +244,21 @@ class SaleAPIController extends AppBaseController
             return $this->sendError('Sale not found');
         }
 
-        $new_sale_state_id = $input['sale_state'];
+        $new_sale_state_id = $input['sale_state_id'];
 
         DB::beginTransaction();
 
         $sale = $this->saleRepository->update($input, $id);
         $new_sale_state = SaleService::setSaleState($sale, $new_sale_state_id,'sale_update',null, false);
 
-        if ($new_sale_state_id == 2) {
+        // Si la venta se cambia a pagada, generar movimientos de credito a los proveedores
+        if ($new_sale_state_id == 3) {
             $products = $sale->products();
             foreach ($products as $product) {
                 MovementsService::generateProviderCredit($product,$sale);
             }
         }
         $sale->save();
-
         DB::commit();
         $sale = $this->saleRepository->find($id);
         return response()->json($sale);

@@ -8,6 +8,7 @@ use App\Models\Image;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Repositories\ProductRepository;
+use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductResource;
@@ -119,19 +120,31 @@ class ProductAPIController extends AppBaseController
 
     public function query(Request $request)
      {
-        //($search = [], $skip = null, $limit = null, $withs = [], $sorts = [], $like = null)
-        $products = $this->productRepository->allQueryFull
-        (
-            $request->except(['skip', 'limit','like','withs','sorts']),
-            $request->get('skip'),
-            $request->get('limit'),
-            [],
-            [],
-            $request->get('like')
 
+         $search = $request->only(['provider_id', 'status', 'date_from', 'date_to','store_id']);
+         $q = $request->get('q');
+         $page = $request->get('page', 1);
+         $size = $request->get('size', 10);
+         $sort = $request->get('sort', 'date,desc');
+         $orders = null;
+         if ($sort) {
+             $sortParts = explode(',', $sort);
+             $orders = [];
+             for ($i = 0; $i < count($sortParts); $i += 2) {
+                 if (isset($sortParts[$i + 1])) {
+                     $orders[] = $sortParts[$i] . ',' . $sortParts[$i + 1];
+                 }
+             }
+         }
+
+        $query = $this->productRepository->allProductsQuery(
+            $search,
+            $q,
+            $orders
         );
 
-        return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully');
+        return PaginationService::forAngular($query, $request);
+        // return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully');
     }
 
 
@@ -176,6 +189,78 @@ class ProductAPIController extends AppBaseController
         $product = $this->productRepository->create($input);
 
         return $this->sendResponse(new ProductResource($product), 'Product created successfully');
+    }
+
+    /**
+     * Store multiple products at once.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function bulkStore(Request $request)
+    {
+        $products = $request->get('products');
+        $storeId = $request->get('store_id');
+
+        if (!is_array($products)) {
+            return $this->sendError('Invalid data format. Expected an array of products.');
+        }
+
+        $results = [
+            'total' => count($products),
+            'success' => 0,
+            'errors' => []
+        ];
+
+        DB::beginTransaction();
+        try {
+            foreach ($products as $index => $data) {
+                try {
+                    // Match Provider if name is given
+                    if (!empty($data['provider_name']) && empty($data['provider_id'])) {
+                        $provider = \App\Models\Provider::where('name', 'LIKE', $data['provider_name'])->first();
+                        if ($provider) {
+                            $data['provider_id'] = $provider->id;
+                        }
+                    }
+
+                    // Match Category if name is given
+                    if (!empty($data['category_name']) && empty($data['category_id'])) {
+                        $category = \App\Models\Category::where('name', 'LIKE', $data['category_name'])->first();
+                        if ($category) {
+                            $data['category_id'] = $category->id;
+                        }
+                    }
+
+                    // Match State if name is given
+                    if (!empty($data['state_name']) && empty($data['state_id'])) {
+                        $state = \App\Models\ProductState::where('name', 'LIKE', $data['state_name'])->first();
+                        if ($state) {
+                            $data['state_id'] = $state->id;
+                        }
+                    }
+
+                    $data['store_id'] = $storeId;
+                    $data['code'] = $data['code'] ?? strtoupper(substr(uniqid(), 0, 10));
+                    $data['state_id'] = $data['state_id'] ?? 1; // Default to Available if not set
+
+                    $this->productRepository->create($data);
+                    $results['success']++;
+                } catch (\Exception $e) {
+                    $results['errors'][] = [
+                        'index' => $index,
+                        'code' => $data['code'] ?? 'UNKNOWN',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error processing bulk import: ' . $e->getMessage());
+        }
+
+        return $this->sendResponse($results, 'Bulk import processed.');
     }
 
     /**

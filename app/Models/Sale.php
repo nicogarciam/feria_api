@@ -154,6 +154,46 @@ class Sale extends Model
         'updated_at' => 'nullable'
     ];
 
+    protected $fieldSearchable = [
+        'code'
+    ];
+
+
+    public function scopeSearch($query, $search)
+    {
+        if (!$search) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+
+            // Campos propios de Sale
+            foreach ($this->fieldSearchable as $field) {
+                $q->orWhere($field, 'like', "%{$search}%");
+            }
+
+            // Customer
+            $q->orWhereHas('customer', function ($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+
+            // Product (via SaleItem)
+            $q->orWhereHas('sale_items.product', function ($q2) use ($search) {
+                $q2->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+
+            // Provider (via Product)
+            $q->orWhereHas('sale_items.product.provider', function ($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+
+        });
+    }
+
     public function customer()
     {
         return $this->belongsTo('App\Models\Customer');
@@ -169,12 +209,17 @@ class Sale extends Model
         return $this->belongsTo('App\Models\SaleState');
     }
 
+    public function sale_items()
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
     public function products()
     {
-
         return $this->belongsToMany(Product::class, 'sale_items')->as('sale_item')
-            ->withPivot('product_id', 'price');
+            ->withPivot('product_id', 'price', 'status', 'quantity');
     }
+
 
     public function payments()
     {

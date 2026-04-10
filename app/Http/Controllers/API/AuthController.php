@@ -77,6 +77,7 @@ class AuthController extends Controller
         $this->accountRepository = $accountRepo;
     }
 
+
     /**
      * Get a JWT via given credentials.
      *
@@ -359,7 +360,7 @@ class AuthController extends Controller
     {
         $test = [
             'status' => 'ok',
-            'msg' => 'Welcome to ALOJAR API'
+            'msg' => 'Welcome to FERIAR API'
         ];
 
 

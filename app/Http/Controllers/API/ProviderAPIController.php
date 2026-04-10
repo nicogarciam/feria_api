@@ -335,4 +335,61 @@ class ProviderAPIController extends AppBaseController
 
         return $this->sendSuccess('Provider deleted successfully');
     }
+
+    /**
+     * Get provider statistics for a specific store
+     *
+     * @param int $providerId
+     * @param int $storeId
+     * @return Response
+     *
+     * @SWG\Get(
+     *      path="/providers/{providerId}/stores/{storeId}/stats",
+     *      summary="Get statistics for provider in a specific store",
+     *      tags={"Provider"},
+     *      security={{"jwt":{}}},
+     *      @SWG\Parameter(
+     *          name="providerId",
+     *          description="ID of the Provider",
+     *          type="integer",
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @SWG\Parameter(
+     *          name="storeId",
+     *          description="ID of the Store",
+     *          type="integer",
+     *          required=true,
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="totalSales", type="number", description="Total sales amount"),
+     *              @SWG\Property(property="totalPaid", type="number", description="Total amount paid"),
+     *              @SWG\Property(property="pendingBalance", type="number", description="Pending balance to be paid"),
+     *              @SWG\Property(property="activeProducts", type="integer", description="Number of active products"),
+     *              @SWG\Property(property="totalProducts", type="integer", description="Total number of products")
+     *          )
+     *      ),
+     *      @SWG\Response(
+     *          response=404,
+     *          description="Provider or Store not found"
+     *      )
+     * )
+     */
+    public function stats($providerId, $storeId)
+    {
+        $provider = $this->providerRepository->find($providerId);
+
+        if (empty($provider)) {
+            return $this->sendError('Provider not found', [], 404);
+        }
+
+        $stats = $this->providerRepository->getProviderStoreStats($providerId, $storeId);
+
+        return response()->json($stats);
+    }
 }

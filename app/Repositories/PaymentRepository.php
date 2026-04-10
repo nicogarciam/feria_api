@@ -33,8 +33,7 @@ class PaymentRepository extends BaseRepository
 
     protected $fieldLikeable = [
         'pay_date',
-        'amount',
-        'user'
+        'amount'
     ];
 
     /**
@@ -61,7 +60,56 @@ class PaymentRepository extends BaseRepository
     }
 
 
-    public function allLike($search , $skip = null, $limit = null, $where = null, $customer_id = null, $orders = null)
+    public function allLike($search, $where = null, $customer_id = null, $orders = null)
+    {
+        return $this->allLikeQuery(
+            $search, $where, $customer_id, $orders
+        )->get();
+    }
+
+
+    public function allLikeQuery($search , $where = null, $customer_id = null, $orders = null)
+    {
+        $query = $this->model->newQuery();
+        $this->search = $search;
+
+        if ($search) {
+            $fields = $this->getFieldsLikeable();
+            foreach($fields as $field) {
+                $query->orWhere($field, 'like',  "%$search%");
+            }
+        }
+
+        if ($customer_id) {
+            $query->leftJoin('sales', 'sales.id', '=', 'payments.sale_id');;
+            $query->where('sales.customer_id', $customer_id);
+        }
+
+        if ($where) {
+            foreach($where as $key => $value) {
+                if ($key == 'date_from') {
+                    $query->where('pay_date', '>=', $value);
+                } elseif ($key == 'date_to') {
+                    $query->where('pay_date', '<=', $value);
+                } else{
+                    $query->where($key, $value);
+                }
+            }
+        }
+
+        if ($orders) {
+            foreach ($orders as $order) {
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
+            }
+        } else {
+            $query->orderBy('pay_date');
+        }
+        return $query;
+    }
+    public function pageLike($search, $where = null, $customer_id = null, $page = null, $size = null, $sort = null)
     {
         $query = $this->model->newQuery();
         $this->search = $search;
@@ -84,24 +132,24 @@ class PaymentRepository extends BaseRepository
             }
         }
 
-        if (!is_null($skip)) {
-            $query->skip($skip);
-        }
 
-        if (!is_null($limit)) {
-            $query->limit($limit);
-        }
-
-        if ($orders) {
-            foreach ($orders as $order) {
-                $query->orderBy($order);
+        if ($sort) {
+            foreach ($sort as $order) {
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
             }
         } else {
             $query->orderBy('pay_date');
         }
 
-        return $query->get();
+        $result = $query->paginate($page['size'], ['*'], 'page', $page['page']);
+
+        return $result;
     }
+
+
 
     public function forSaleFull($saleId)
     {

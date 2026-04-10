@@ -28,6 +28,7 @@ class ProductRepository extends BaseRepository
     protected $fieldLikeable = [
         'code',
         'description',
+        'title'
     ];
 
     /**
@@ -89,6 +90,47 @@ class ProductRepository extends BaseRepository
         $query->select('products.*', 'sale_items.id as item_id', 'sale_items.price as item_price');
 
         return $query->get();
+    }
+
+    public function allProductsQuery($search = [], $q, $orders = null)
+    {
+        $query = $this->model->newQuery();
+
+
+        if ($q && $q != '') {
+            $fields = $this->getFieldsLikeable();
+            foreach($fields as $field) {
+                $query->orWhere($field, 'like',  "%$q%");
+            }
+        }
+
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, $this->getFieldsSearchable())) {
+                    if ($key == 'date_from') {
+                        $query->where('created_at', '>=', $value);
+                    } elseif ($key == 'date_to') {
+                        $query->where('created_at', '<=', $value);
+                    } else{
+                        $query->where($key, $value);
+                    }
+                }
+            }
+        }
+
+        // Handle sorting
+        if ($orders) {
+            foreach ($orders as $order) {
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
+            }
+        } else {
+            $query->orderBy('generated_at');
+        }
+
+        return $query->with(['provider']);
     }
 
 
