@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
-use App\Http\Resources\SettlementResource;
 use App\Models\SaleItem;
 use App\Models\Settlement;
 use App\Repositories\SettlementRepository;
@@ -359,7 +358,7 @@ class SettlementAPIController extends AppBaseController
             $settlement = $this->settlementRepository->cancelSettlement($id, auth()->id());
 
             return $this->sendResponse(
-                new SettlementResource($settlement),
+                $settlement,
                 'Settlement cancelled successfully'
             );
 
@@ -443,7 +442,7 @@ class SettlementAPIController extends AppBaseController
             $settlement = $this->settlementRepository->markSettlementAsPaid($id, auth()->id());
 
             return $this->sendResponse(
-                new SettlementResource($settlement),
+                new $settlement,
                 'Settlement marked as paid successfully'
             );
 
