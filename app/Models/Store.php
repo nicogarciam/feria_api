@@ -150,4 +150,11 @@ class Store extends Model
     {
         return $this->belongsTo('App\Models\City');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany('App\Models\User', 'user_store', 'store_id', 'user_id')
+                    ->withPivot('role', 'active')
+                    ->withTimestamps();
+    }
 }

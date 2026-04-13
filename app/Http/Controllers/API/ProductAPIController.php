@@ -12,6 +12,7 @@ use App\Services\PaginationService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\ProductResource;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Response;
@@ -479,6 +480,40 @@ class ProductAPIController extends AppBaseController
         $products = $this->productRepository->findByStore($storeId, $type);
 
         return $this->sendResponse(ProductResource::collection($products), 'Products retrieved successfully');
+    }
+
+    /**
+     * Get borrowed products for a store.
+     */
+    public function borrowedProducts($storeId)
+    {
+        $valid = DataAccessValidation::validateStore($storeId);
+
+        if (!$valid) {
+            return $this->sendError('unauthorized.store', '403');
+        }
+
+        $products = $this->productRepository->borrowedProducts($storeId);
+
+        $mapped = $products->map(function ($product) {
+            $dateSale = Carbon::parse($product->date_sale);
+            $days = clone $dateSale;
+            $days = $days->diffInDays(\Illuminate\Support\Carbon::now());
+
+            return [
+                'id' => $product->id, // product id
+                'sale_id' => $product->sale_id,
+                'sale_code' => $product->sale_code,
+                'customer_name' => $product->customer_name ?? 'Consumidor Final',
+                'customer_phone' => $product->customer_phone,
+                'product_title' => $product->title ?? 'Producto',
+                'product_image' => $product->images->first()->url ?? '',
+                'date_sale' => $product->date_sale,
+                'days_borrowed' => $days
+            ];
+        });
+
+        return response()->json($mapped);
     }
 
     /**

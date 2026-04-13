@@ -92,6 +92,36 @@ class ProductRepository extends BaseRepository
         return $query->get();
     }
 
+    public function borrowedProducts($storeId)
+    {
+        $query = $this->model->newQuery();
+        $withs = ['category', 'state', 'provider', 'images'];
+
+        foreach ($withs as $value) {
+            $query->with($value);
+        }
+
+        $query->where('products.store_id', $storeId);
+        $query->where('products.state_id', 2); // 2 = TRIAL
+
+        $query->join('sale_items', 'products.id', '=', 'sale_items.product_id');
+        $query->join('sales', 'sale_items.sale_id', '=', 'sales.id');
+        $query->leftJoin('customers', 'sales.customer_id', '=', 'customers.id');
+
+        $query->orderBy('sales.created_at', 'desc');
+
+        $query->select(
+            'products.*',
+            'sales.id as sale_id',
+            'sales.code as sale_code',
+            'sales.date_sale as date_sale',
+            'customers.name as customer_name',
+            'customers.phone as customer_phone'
+        );
+
+        return $query->get()->unique('id')->values();
+    }
+
     public function allProductsQuery($search = [], $q, $orders = null)
     {
         $query = $this->model->newQuery();

@@ -162,6 +162,22 @@ class AccountAPIController extends AppBaseController
     {
         $input = $request->all();
 
+        $turnstileResponse = $request->input('cf-turnstile-response');
+        if (!$turnstileResponse) {
+            return $this->sendError('Verificación de seguridad requerida.', 422);
+        }
+
+        $secretKey = env('CF_TURNSTILE_SECRET', '1x0000000000000000000000000000000AA');
+        $cfResponse = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret' => $secretKey,
+            'response' => $turnstileResponse,
+        ]);
+
+        $verification = $cfResponse->json();
+        if (empty($verification['success']) || !$verification['success']) {
+            return $this->sendError('Falló la verificación de seguridad.', 422);
+        }
+
         $input['activated'] = false;
 
         $userData = $input;

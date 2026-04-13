@@ -65,6 +65,12 @@ Route::group([
     Route::get('stores/select/{storeId}', [StoreAPIController::class,'selectStore']);
     Route::post('stores/upload_logo',[StoreAPIController::class,'updateLogo']);
 
+    // Store User Management
+    Route::get('stores/{id}/users', [\App\Http\Controllers\API\StoreUserAPIController::class, 'index']);
+    Route::post('stores/{id}/users', [\App\Http\Controllers\API\StoreUserAPIController::class, 'store']);
+    Route::put('stores/{id}/users/{userId}', [\App\Http\Controllers\API\StoreUserAPIController::class, 'update']);
+    Route::delete('stores/{id}/users/{userId}', [\App\Http\Controllers\API\StoreUserAPIController::class, 'destroy']);
+
     Route::get('my_account','App\Http\Controllers\API\AccountAPIController@myAccount');
 
     Route::post('accounts/balance',[MovementAPIController::class,'balance']);
@@ -72,6 +78,7 @@ Route::group([
     Route::get('stores/{storeId}/categories', [CategoryAPIController::class,'findByStore']);
 
     Route::get('stores/{storeId}/products',[ProductAPIController::class,'findByStore'] );
+    Route::get('stores/{storeId}/borrowed_products', [ProductAPIController::class, 'borrowedProducts']);
 
     Route::get('stores/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
 

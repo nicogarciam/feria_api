@@ -14,6 +14,10 @@ class DataAccessValidation
             return true;
         }
 
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
+            return true;
+        }
+
         $stores = $this->getCheckStores();
 
         $tmp = [];
@@ -28,6 +32,10 @@ class DataAccessValidation
     public function validateProducts($productIds)
     {
         if (empty($productIds) || sizeof($productIds) < 1 ) {
+            return [];
+        }
+
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
             return [];
         }
 
@@ -60,6 +68,10 @@ class DataAccessValidation
     public function validateSale($saleId)
     {
         if (!$saleId ) {
+            return true;
+        }
+
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
             return true;
         }
 

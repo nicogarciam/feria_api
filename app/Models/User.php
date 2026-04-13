@@ -31,7 +31,8 @@ class User extends Authenticatable implements JWTSubject
         'fist_login',
         'logins',
         'google_id',
-        'picture'
+        'picture',
+        'role'
     ];
 
     /**
@@ -112,8 +113,12 @@ class User extends Authenticatable implements JWTSubject
     public function myStores()
     {
         $stores = Store::with('city')
-            ->Where('stores.owner_id', $this->id)
-                        //->toSql();
+            ->where(function($query) {
+                $query->where('stores.owner_id', $this->id)
+                      ->orWhereHas('users', function($q) {
+                          $q->where('user_store.user_id', $this->id);
+                      });
+            })
             ->get();
 
         $this->stores = $stores;
