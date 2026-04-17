@@ -88,3 +88,11 @@ OPEN curMembresias;
     CLOSE curMembresias;
     END$$
 DELIMITER ;
+
+
+
+- server
+  https://admin.alwaysdata.com/
+- feriar
+- Fe123qwe.
+- DB: feriar_prod
