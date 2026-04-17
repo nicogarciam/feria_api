@@ -36,6 +36,11 @@ class CouponAPIController extends AppBaseController
      *      tags={"Coupon"},
      *      description="Get all Coupons",
      *      produces={"application/json"},
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function index(Request $request)
     {
@@ -57,6 +62,11 @@ class CouponAPIController extends AppBaseController
      *      summary="Store a newly created Coupon in storage",
      *      tags={"Coupon"},
      *      description="Store Coupon",
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function store(CreateCouponAPIRequest $request)
     {
@@ -77,6 +87,11 @@ class CouponAPIController extends AppBaseController
      *      tags={"Coupon"},
      *      description="Get Coupon",
 
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function show($id)
     {
@@ -100,6 +115,11 @@ class CouponAPIController extends AppBaseController
      *      summary="Update the specified Coupon in storage",
      *      tags={"Coupon"},
      *      description="Update Coupon",
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function update($id, UpdateCouponAPIRequest $request)
     {
@@ -126,6 +146,11 @@ class CouponAPIController extends AppBaseController
      *      summary="Remove the specified Coupon from storage",
      *      tags={"Coupon"},
      *      description="Delete Coupon",
+          *      @SWG\Response(
+     *          response=200,
+     *          description="Successful operation"
+     *      )
+* )
      */
     public function destroy($id)
     {

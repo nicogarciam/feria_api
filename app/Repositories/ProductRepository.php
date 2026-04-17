@@ -28,6 +28,7 @@ class ProductRepository extends BaseRepository
     protected $fieldLikeable = [
         'code',
         'description',
+        'title'
     ];
 
     /**
@@ -53,6 +54,25 @@ class ProductRepository extends BaseRepository
         return Product::class;
     }
 
+    public function full($id)
+    {
+
+        $query = $this->model->newQuery();
+        $withs = ['category','state','provider','images'];
+
+        if (count($withs)) {
+            foreach($withs as $value) {
+                $query->with($value);
+            }
+        }
+
+        $query->where('id', $id);
+
+        // $query->select('products.*', 'sale_items.id as item_id', 'sale_items.price as item_price');
+
+        return $query->get();
+    }
+
     public function forSaleFull($saleId)
     {
 
@@ -70,6 +90,77 @@ class ProductRepository extends BaseRepository
         $query->select('products.*', 'sale_items.id as item_id', 'sale_items.price as item_price');
 
         return $query->get();
+    }
+
+    public function borrowedProducts($storeId)
+    {
+        $query = $this->model->newQuery();
+        $withs = ['category', 'state', 'provider', 'images'];
+
+        foreach ($withs as $value) {
+            $query->with($value);
+        }
+
+        $query->where('products.store_id', $storeId);
+        $query->where('products.state_id', 2); // 2 = TRIAL
+
+        $query->join('sale_items', 'products.id', '=', 'sale_items.product_id');
+        $query->join('sales', 'sale_items.sale_id', '=', 'sales.id');
+        $query->leftJoin('customers', 'sales.customer_id', '=', 'customers.id');
+
+        $query->orderBy('sales.created_at', 'desc');
+
+        $query->select(
+            'products.*',
+            'sales.id as sale_id',
+            'sales.code as sale_code',
+            'sales.date_sale as date_sale',
+            'customers.name as customer_name',
+            'customers.phone as customer_phone'
+        );
+
+        return $query->get()->unique('id')->values();
+    }
+
+    public function allProductsQuery($search = [], $q, $orders = null)
+    {
+        $query = $this->model->newQuery();
+
+
+        if ($q && $q != '') {
+            $fields = $this->getFieldsLikeable();
+            foreach($fields as $field) {
+                $query->orWhere($field, 'like',  "%$q%");
+            }
+        }
+
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, $this->getFieldsSearchable())) {
+                    if ($key == 'date_from') {
+                        $query->where('created_at', '>=', $value);
+                    } elseif ($key == 'date_to') {
+                        $query->where('created_at', '<=', $value);
+                    } else{
+                        $query->where($key, $value);
+                    }
+                }
+            }
+        }
+
+        // Handle sorting
+        if ($orders) {
+            foreach ($orders as $order) {
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
+            }
+        } else {
+            $query->orderBy('generated_at');
+        }
+
+        return $query->with(['provider']);
     }
 
 

@@ -8,7 +8,88 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @SWG\Definition(
  *      definition="Account",
-
+ *      required={"first_name", "last_name", "email"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Account id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="first_name",
+ *          description="First name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="last_name",
+ *          description="Last name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="activated",
+ *          description="Activated status",
+ *          type="boolean"
+ *      ),
+ *      @SWG\Property(
+ *          property="email",
+ *          description="Email address",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="langKey",
+ *          description="Language key",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="city_id",
+ *          description="City id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="gender",
+ *          description="Gender",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="image_url",
+ *          description="Image URL",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="dni",
+ *          description="Document number",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="user_id",
+ *          description="User id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="address",
+ *          description="Account address",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="phone",
+ *          description="Phone number",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="birthday",
+ *          description="Birthday",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="account_cod",
+ *          description="Account code",
+ *          type="string"
+ *      )
+ * )
  */
 class Account extends Model
 {
@@ -62,8 +143,7 @@ class Account extends Model
      *
      * @var array
      */
-    public static $rules = [
-    ];
+    public static $rules = [];
 
 
     public function user()
@@ -75,5 +155,4 @@ class Account extends Model
     {
         return $this->belongsTo('App\Models\City');
     }
-
 }

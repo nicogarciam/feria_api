@@ -11,7 +11,83 @@ use Illuminate\Support\Carbon;
 /**
  * @SWG\Definition(
  *      definition="Sale",
-
+ *      required={"store_id", "sale_state_id", "date_sale", "total_price"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Sale id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="store_id",
+ *          description="Store id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="customer_id",
+ *          description="Customer id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="sale_state_id",
+ *          description="Sale state id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_sale",
+ *          description="Sale date",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="date_pay",
+ *          description="Payment date",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="note",
+ *          description="Sale note",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="total_price",
+ *          description="Total price",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="coupon_code",
+ *          description="Coupon code",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="days_to_confirm",
+ *          description="Days to confirm",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="days_to_cancel",
+ *          description="Days to cancel",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="user",
+ *          description="User name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="code",
+ *          description="Sale code",
+ *          type="string"
+ *      )
+ * )
  */
 class Sale extends Model
 {
@@ -78,6 +154,46 @@ class Sale extends Model
         'updated_at' => 'nullable'
     ];
 
+    protected $fieldSearchable = [
+        'code'
+    ];
+
+
+    public function scopeSearch($query, $search)
+    {
+        if (!$search) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+
+            // Campos propios de Sale
+            foreach ($this->fieldSearchable as $field) {
+                $q->orWhere($field, 'like', "%{$search}%");
+            }
+
+            // Customer
+            $q->orWhereHas('customer', function ($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+
+            // Product (via SaleItem)
+            $q->orWhereHas('sale_items.product', function ($q2) use ($search) {
+                $q2->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+
+            // Provider (via Product)
+            $q->orWhereHas('sale_items.product.provider', function ($q2) use ($search) {
+                $q2->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+
+        });
+    }
+
     public function customer()
     {
         return $this->belongsTo('App\Models\Customer');
@@ -93,19 +209,25 @@ class Sale extends Model
         return $this->belongsTo('App\Models\SaleState');
     }
 
-    public function products(){
+    public function sale_items()
+    {
+        return $this->hasMany(SaleItem::class);
+    }
 
+    public function products()
+    {
         return $this->belongsToMany(Product::class, 'sale_items')->as('sale_item')
-            ->withPivot('product_id', 'price');
+            ->withPivot('product_id', 'price', 'status', 'quantity');
     }
 
-    public function payments(){
-         return $this->hasMany(Payment::class);
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 
-    public function total_paid() {
+    public function total_paid()
+    {
         return $this->payments()->sum('amount');
     }
-
-
 }

@@ -75,5 +75,9 @@ class Provider extends Model
         return $this->belongsTo('App\Models\City');
     }
 
+    public function settlements()
+    {
+        return $this->hasMany('App\Models\Settlement');
+    }
 
 }

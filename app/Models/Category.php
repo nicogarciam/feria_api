@@ -6,7 +6,40 @@ use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
+/**
+ * @SWG\Definition(
+ *      definition="Category",
+ *      required={"name"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Category id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="name",
+ *          description="Category name",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="description",
+ *          description="Category description",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="category_id",
+ *          description="Parent category id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="color",
+ *          description="Category color",
+ *          type="string"
+ *      )
+ * )
+ */
 class Category extends Model
 {
     use SoftDeletes;
@@ -51,5 +84,4 @@ class Category extends Model
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'
     ];
-
 }

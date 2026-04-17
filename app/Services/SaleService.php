@@ -21,6 +21,7 @@ class SaleService
     {
         if ($payment->sale_id) {
             $sa = Sale::find($payment->sale_id);
+            if (!$sa) return;
             $paid = $sa->total_paid();
             $newStateID = $paid >= $sa->total_price ? SaleState::PAID : ($paid < $sa->total_price ? SaleState::CONFIRMED : $sa->sale_state_id);
             if ($sa->sale_state_id !== $newStateID) {

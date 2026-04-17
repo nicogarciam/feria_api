@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\PaymentResource;
 use Illuminate\Support\Facades\DB;
+use App\Services\PaginationService;
 use Response;
 
 /**
@@ -36,18 +37,19 @@ class PaymentAPIController extends AppBaseController
 
         $input = $request->all();
 
+        $page = $request->get('page', 1);
+        $size = $request->get('size', 10);
+        $sort = $request->get('sort', 'date,desc');
+        $where = $request->except(['page', 'size', 'sort', 'q']);
+
         if (!DataAccessValidation::validateStore(isset($input['store_id']) ?: null)) {
             return $this->sendError('unauthorized.store','403');
         }
 
-        $payments = $this->paymentRepository->allLike(
-            $request->get('search'),
-            $request->get('skip'),
-            $request->get('limit'),
-            $request->except(['skip', 'limit', 'customer_id']),
-            $request->get('customer_id'),
-        );
-        return response()->json($payments);
+
+        $query = $this->paymentRepository->allLikeQuery($request->get('q'), $where, $request->customer_id);
+        // return response()->json($query);
+        return PaginationService::forAngular($query, $request);
     }
 
     public function findForSale($saleId = null)
@@ -64,6 +66,8 @@ class PaymentAPIController extends AppBaseController
     {
         $input = $request->all();
 
+        $input['user'] = auth()->user()->email;
+        $input['payment_state_id'] = $input['payment_state_id'] ?? 1;
         $payment = $this->paymentRepository->create($input);
 
         MovementsService::generatePayCredit($payment);

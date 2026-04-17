@@ -4,97 +4,96 @@
         "title": "Laravel Generator APIs",
         "version": "1.0.0"
     },
-    "basePath": "/api/v1",
+    "basePath": "/api",
     "paths": {
-        "/affiliates": {
+        "/accounts": {
             "get": {
                 "tags": [
-                    "Affiliate"
+                    "Account"
                 ],
-                "summary": "Get a listing of the Affiliates.",
-                "description": "Get all Affiliates",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Get a listing of Accounts.",
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Successful operation",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/Affiliate"
-                                    }
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Account"
+                            }
                         }
                     }
                 }
             },
             "post": {
                 "tags": [
-                    "Affiliate"
+                    "Account"
                 ],
-                "summary": "Store a newly created Affiliate in storage",
-                "description": "Store Affiliate",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "Affiliate that should be stored",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/Affiliate"
-                        }
-                    }
-                ],
+                "summary": "Store a newly created Account in storage",
                 "responses": {
-                    "200": {
-                        "description": "successful operation",
+                    "201": {
+                        "description": "Account created successfully",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Affiliate"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/Account"
                         }
                     }
                 }
             }
         },
-        "/affiliates/{id}": {
+        "/accounts/like/{query}": {
             "get": {
                 "tags": [
-                    "Affiliate"
+                    "Account"
                 ],
-                "summary": "Display the specified Affiliate",
-                "description": "Get Affiliate",
-                "produces": [
-                    "application/json"
+                "summary": "Search for Accounts by query",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "path",
+                        "description": "Search query",
+                        "required": true,
+                        "type": "string"
+                    }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Account"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Register a new user account",
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Account"
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{id}": {
+            "get": {
+                "tags": [
+                    "Account"
+                ],
+                "description": "Display the specified Account",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Affiliate",
+                        "description": "id of Account",
                         "required": true,
                         "type": "integer"
                     }
@@ -108,7 +107,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Affiliate"
+                                    "$ref": "#/definitions/Account"
                                 },
                                 "message": {
                                     "type": "string"
@@ -121,82 +120,213 @@
             },
             "put": {
                 "tags": [
-                    "Affiliate"
+                    "Account"
                 ],
-                "summary": "Update the specified Affiliate in storage",
-                "description": "Update Affiliate",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Update the specified Account in storage",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Affiliate",
+                        "description": "Account id",
                         "required": true,
                         "type": "integer"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "Affiliate that should be updated",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/Affiliate"
-                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Account updated successfully",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Affiliate"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/Account"
                         }
+                    },
+                    "404": {
+                        "description": "Account not found"
                     }
                 }
             },
             "delete": {
                 "tags": [
-                    "Affiliate"
+                    "Account"
                 ],
-                "summary": "Remove the specified Affiliate from storage",
-                "description": "Delete Affiliate",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Remove the specified Account from storage",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Affiliate",
+                        "description": "Account id",
                         "required": true,
                         "type": "integer"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Account deleted successfully"
+                    },
+                    "404": {
+                        "description": "Account not found"
+                    }
+                }
+            }
+        },
+        "/auth/authenticate": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "User credentials",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "schema": {
+                            "$ref": "#/definitions/AuthResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Bad credentials"
+                    }
+                }
+            }
+        },
+        "/auth/google_signin": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google sign-in",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Google credential",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/GoogleSignInRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Google login",
+                        "schema": {
+                            "$ref": "#/definitions/AuthResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Bad Google credentials"
+                    }
+                }
+            }
+        },
+        "/auth/account": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user information",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User logout",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out",
                         "schema": {
                             "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "string"
-                                },
                                 "message": {
-                                    "type": "string"
+                                    "description": "Log the user out (Invalidate the token).",
+                                    "type": "string",
+                                    "example": "Successfully logged out"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh authentication token",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/AuthResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/auth/test": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Test API endpoint",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "description": "Test endpoint.",
+                                    "type": "string",
+                                    "example": "ok"
+                                },
+                                "msg": {
+                                    "description": "Test endpoint.",
+                                    "type": "string",
+                                    "example": "Welcome to ALOJAR API"
                                 }
                             },
                             "type": "object"
@@ -207,170 +337,287 @@
         },
         "/cities": {
             "get": {
-                "tags": [
-                    "City"
-                ],
                 "summary": "Get a listing of the Cities.",
-                "description": "Get all Cities",
-                "produces": [
-                    "application/json"
-                ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/City"
-                                    }
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
+                        "description": "Successful operation"
                     }
                 }
             },
             "post": {
-                "tags": [
-                    "City"
-                ],
                 "summary": "Store a newly created City in storage",
-                "description": "Store City",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "City that should be stored",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/City"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/City"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
+                        "description": "Successful operation"
                     }
                 }
             }
         },
         "/cities/{id}": {
             "get": {
-                "tags": [
-                    "City"
-                ],
                 "summary": "Display the specified City",
-                "description": "Get City",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of City",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/City"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
+                        "description": "Successful operation"
                     }
                 }
             },
             "put": {
-                "tags": [
-                    "City"
-                ],
                 "summary": "Update the specified City in storage",
-                "description": "Update City",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of City",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "City that should be updated",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/City"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/City"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
+                        "description": "Successful operation"
                     }
                 }
             },
             "delete": {
-                "tags": [
-                    "City"
-                ],
                 "summary": "Remove the specified City from storage",
-                "description": "Delete City",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/coupons": {
+            "get": {
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Get a listing of the Coupons.",
+                "description": "Get all Coupons",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Store a newly created Coupon in storage",
+                "description": "Store Coupon",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/coupons/{id}": {
+            "get": {
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Display the specified Coupon",
+                "description": "Get Coupon",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Update the specified Coupon in storage",
+                "description": "Update Coupon",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Remove the specified Coupon from storage",
+                "description": "Delete Coupon",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/customers": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Get a listing of the Customers.",
+                "description": "Get all Customers",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Store a newly created Customer in storage",
+                "description": "Store Customer",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/customers/{id}": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Display the specified Customer",
+                "description": "Get Customer",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Update the specified Customer in storage",
+                "description": "Update Customer",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Remove the specified Customer from storage",
+                "description": "Delete Customer",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/discounts": {
+            "get": {
+                "tags": [
+                    "Discount"
+                ],
+                "summary": "Get a listing of Discounts.",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Discount"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Discount"
+                ],
+                "summary": "Store a newly created Discount in storage",
+                "description": "Store Discount",
+                "responses": {
+                    "201": {
+                        "description": "Discount created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Discount"
+                        }
+                    }
+                }
+            }
+        },
+        "/discounts/{id}": {
+            "get": {
+                "tags": [
+                    "Discount"
+                ],
+                "summary": "Display the specified Discount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Discount id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Discount"
+                        }
+                    },
+                    "404": {
+                        "description": "Discount not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Discount"
+                ],
+                "summary": "Update the specified Discount in storage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Discount id",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Discount updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Discount"
+                        }
+                    },
+                    "404": {
+                        "description": "Discount not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Discount"
+                ],
+                "summary": "Remove the specified Discount from storage",
+                "description": "Delete Discount",
                 "produces": [
                     "application/json"
                 ],
@@ -378,39 +625,430 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of City",
+                        "description": "Discount id",
                         "required": true,
                         "type": "integer"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Discount deleted successfully"
+                    }
+                }
+            }
+        },
+        "/images/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Delete an image",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image deleted successfully"
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/product/{productId}/upload": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload images for a product",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Array of base64 encoded images",
+                        "required": true,
                         "schema": {
                             "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "type": "string"
+                                "images": {
+                                    "description": "Upload images for a product.",
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "src": {
+                                                "description": "Base64 encoded image data URI",
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
                                 }
                             },
                             "type": "object"
                         }
                     }
-                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Images uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "success": {
+                                    "description": "Upload images for a product.",
+                                    "type": "boolean"
+                                },
+                                "message": {
+                                    "description": "Upload images for a product.",
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "description": "Upload images for a product.",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Image"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "Error uploading images"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
             }
         },
-        "/entities": {
+        "/images/product/{productId}/delete": {
+            "delete": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Delete all images for a product",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Images deleted successfully"
+                    },
+                    "404": {
+                        "description": "No images found for product"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/upload": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload a single image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "in": "formData",
+                        "description": "Image file to upload",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "formData",
+                        "description": "Associated product ID",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                },
+                                "src": {
+                                    "description": "Image source URL",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "No image file provided"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/{id}/suggest_price": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Get AI-based price suggestion for an image",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Price suggestion retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/PriceSuggestion"
+                        }
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "422": {
+                        "description": "Could not extract features for the image"
+                    },
+                    "500": {
+                        "description": "Error processing price suggestion"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/{id}/extract_features": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Extract features from an image using AI",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Image ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image features extracted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ImageFeatures"
+                        }
+                    },
+                    "404": {
+                        "description": "Image not found"
+                    },
+                    "500": {
+                        "description": "Failed to extract image features"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/upload_general": {
+            "post": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Upload a general image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "in": "formData",
+                        "description": "Image file to upload (jpeg, png, jpg, gif, svg)",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "No image file uploaded"
+                    },
+                    "415": {
+                        "description": "Invalid image type"
+                    },
+                    "500": {
+                        "description": "Failed to save image"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/images/set_primary": {
+            "put": {
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Set an image as primary",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Image data",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "id"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "description": "Image ID",
+                                    "type": "integer"
+                                },
+                                "src": {
+                                    "description": "Image source path",
+                                    "type": "string"
+                                },
+                                "benefit_id": {
+                                    "description": "Benefit ID",
+                                    "type": "integer"
+                                },
+                                "store_id": {
+                                    "description": "Store ID",
+                                    "type": "integer"
+                                },
+                                "activity_id": {
+                                    "description": "Activity ID",
+                                    "type": "integer"
+                                },
+                                "event_id": {
+                                    "description": "Event ID",
+                                    "type": "integer"
+                                },
+                                "entity_id": {
+                                    "description": "Entity ID",
+                                    "type": "integer"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image set as primary successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Image"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/paymentItems": {
             "get": {
                 "tags": [
-                    "Entity"
+                    "PaymentItem"
                 ],
-                "summary": "Get a listing of the Entities.",
-                "description": "Get all Entities",
+                "summary": "Get a listing of the PaymentItems.",
+                "description": "Get all PaymentItems",
                 "produces": [
                     "application/json"
                 ],
@@ -425,7 +1063,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/Entity"
+                                        "$ref": "#/definitions/PaymentItem"
                                     }
                                 },
                                 "message": {
@@ -439,10 +1077,10 @@
             },
             "post": {
                 "tags": [
-                    "Entity"
+                    "PaymentItem"
                 ],
-                "summary": "Store a newly created Entity in storage",
-                "description": "Store Entity",
+                "summary": "Store a newly created PaymentItem in storage",
+                "description": "Store PaymentItem",
                 "produces": [
                     "application/json"
                 ],
@@ -450,10 +1088,10 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Entity that should be stored",
+                        "description": "PaymentItem that should be stored",
                         "required": false,
                         "schema": {
-                            "$ref": "#/definitions/Entity"
+                            "$ref": "#/definitions/PaymentItem"
                         }
                     }
                 ],
@@ -466,7 +1104,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Entity"
+                                    "$ref": "#/definitions/PaymentItem"
                                 },
                                 "message": {
                                     "type": "string"
@@ -478,13 +1116,13 @@
                 }
             }
         },
-        "/entities/{id}": {
+        "/paymentItems/{id}": {
             "get": {
                 "tags": [
-                    "Entity"
+                    "PaymentItem"
                 ],
-                "summary": "Display the specified Entity",
-                "description": "Get Entity",
+                "summary": "Display the specified PaymentItem",
+                "description": "Get PaymentItem",
                 "produces": [
                     "application/json"
                 ],
@@ -492,7 +1130,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Entity",
+                        "description": "id of PaymentItem",
                         "required": true,
                         "type": "integer"
                     }
@@ -506,7 +1144,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Entity"
+                                    "$ref": "#/definitions/PaymentItem"
                                 },
                                 "message": {
                                     "type": "string"
@@ -519,10 +1157,10 @@
             },
             "put": {
                 "tags": [
-                    "Entity"
+                    "PaymentItem"
                 ],
-                "summary": "Update the specified Entity in storage",
-                "description": "Update Entity",
+                "summary": "Update the specified PaymentItem in storage",
+                "description": "Update PaymentItem",
                 "produces": [
                     "application/json"
                 ],
@@ -530,17 +1168,17 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Entity",
+                        "description": "id of PaymentItem",
                         "required": true,
                         "type": "integer"
                     },
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Entity that should be updated",
+                        "description": "PaymentItem that should be updated",
                         "required": false,
                         "schema": {
-                            "$ref": "#/definitions/Entity"
+                            "$ref": "#/definitions/PaymentItem"
                         }
                     }
                 ],
@@ -553,7 +1191,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Entity"
+                                    "$ref": "#/definitions/PaymentItem"
                                 },
                                 "message": {
                                     "type": "string"
@@ -566,10 +1204,10 @@
             },
             "delete": {
                 "tags": [
-                    "Entity"
+                    "PaymentItem"
                 ],
-                "summary": "Remove the specified Entity from storage",
-                "description": "Delete Entity",
+                "summary": "Remove the specified PaymentItem from storage",
+                "description": "Delete PaymentItem",
                 "produces": [
                     "application/json"
                 ],
@@ -577,7 +1215,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Entity",
+                        "description": "id of PaymentItem",
                         "required": true,
                         "type": "integer"
                     }
@@ -603,13 +1241,13 @@
                 }
             }
         },
-        "/memberships": {
+        "/paymentStates": {
             "get": {
                 "tags": [
-                    "Membership"
+                    "PaymentState"
                 ],
-                "summary": "Get a listing of the Memberships.",
-                "description": "Get all Memberships",
+                "summary": "Get a listing of the PaymentStates.",
+                "description": "Get all PaymentStates",
                 "produces": [
                     "application/json"
                 ],
@@ -624,7 +1262,7 @@
                                 "data": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/definitions/Membership"
+                                        "$ref": "#/definitions/PaymentState"
                                     }
                                 },
                                 "message": {
@@ -638,10 +1276,10 @@
             },
             "post": {
                 "tags": [
-                    "Membership"
+                    "PaymentState"
                 ],
-                "summary": "Store a newly created Membership in storage",
-                "description": "Store Membership",
+                "summary": "Store a newly created PaymentState in storage",
+                "description": "Store PaymentState",
                 "produces": [
                     "application/json"
                 ],
@@ -649,10 +1287,10 @@
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Membership that should be stored",
+                        "description": "PaymentState that should be stored",
                         "required": false,
                         "schema": {
-                            "$ref": "#/definitions/Membership"
+                            "$ref": "#/definitions/PaymentState"
                         }
                     }
                 ],
@@ -665,7 +1303,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Membership"
+                                    "$ref": "#/definitions/PaymentState"
                                 },
                                 "message": {
                                     "type": "string"
@@ -677,13 +1315,13 @@
                 }
             }
         },
-        "/memberships/{id}": {
+        "/paymentStates/{id}": {
             "get": {
                 "tags": [
-                    "Membership"
+                    "PaymentState"
                 ],
-                "summary": "Display the specified Membership",
-                "description": "Get Membership",
+                "summary": "Display the specified PaymentState",
+                "description": "Get PaymentState",
                 "produces": [
                     "application/json"
                 ],
@@ -691,7 +1329,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Membership",
+                        "description": "id of PaymentState",
                         "required": true,
                         "type": "integer"
                     }
@@ -705,7 +1343,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Membership"
+                                    "$ref": "#/definitions/PaymentState"
                                 },
                                 "message": {
                                     "type": "string"
@@ -718,10 +1356,10 @@
             },
             "put": {
                 "tags": [
-                    "Membership"
+                    "PaymentState"
                 ],
-                "summary": "Update the specified Membership in storage",
-                "description": "Update Membership",
+                "summary": "Update the specified PaymentState in storage",
+                "description": "Update PaymentState",
                 "produces": [
                     "application/json"
                 ],
@@ -729,17 +1367,17 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Membership",
+                        "description": "id of PaymentState",
                         "required": true,
                         "type": "integer"
                     },
                     {
                         "name": "body",
                         "in": "body",
-                        "description": "Membership that should be updated",
+                        "description": "PaymentState that should be updated",
                         "required": false,
                         "schema": {
-                            "$ref": "#/definitions/Membership"
+                            "$ref": "#/definitions/PaymentState"
                         }
                     }
                 ],
@@ -752,7 +1390,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/Membership"
+                                    "$ref": "#/definitions/PaymentState"
                                 },
                                 "message": {
                                     "type": "string"
@@ -765,10 +1403,10 @@
             },
             "delete": {
                 "tags": [
-                    "Membership"
+                    "PaymentState"
                 ],
-                "summary": "Remove the specified Membership from storage",
-                "description": "Delete Membership",
+                "summary": "Remove the specified PaymentState from storage",
+                "description": "Delete PaymentState",
                 "produces": [
                     "application/json"
                 ],
@@ -776,7 +1414,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of Membership",
+                        "description": "id of PaymentState",
                         "required": true,
                         "type": "integer"
                     }
@@ -802,95 +1440,543 @@
                 }
             }
         },
-        "/membershipTypes": {
+        "/products": {
             "get": {
                 "tags": [
-                    "MembershipType"
+                    "Product"
                 ],
-                "summary": "Get a listing of the MembershipTypes.",
-                "description": "Get all MembershipTypes",
-                "produces": [
-                    "application/json"
+                "summary": "Get a listing of all Products",
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "type": "integer"
+                    }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Store a newly created Product",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Product data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Display the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Product data",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Remove the specified Product",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product deleted successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/store/{storeId}/products/{type}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Find products for a specific store",
+                "parameters": [
+                    {
+                        "name": "storeId",
+                        "in": "path",
+                        "description": "Store ID",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Product type filter",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized store access"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/sales/{saleId}/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Find products for a specific sale",
+                "parameters": [
+                    {
+                        "name": "saleId",
+                        "in": "path",
+                        "description": "Sale ID",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sale not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/providers": {
+            "get": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Get a listing of all Providers",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "type": "string"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of records to skip",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of records to return",
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Provider"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Store a newly created Provider in storage",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Provider that should be stored",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/ProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/providers/{id}": {
+            "get": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Display the specified Provider",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Update the specified Provider in storage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Provider that should be updated",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/ProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "$ref": "#/definitions/Provider"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Provider"
+                ],
+                "summary": "Remove the specified Provider from storage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Provider",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
                         "schema": {
                             "properties": {
                                 "success": {
+                                    "description": "Remove the specified Provider from storage.",
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/MembershipType"
-                                    }
+                                    "description": "Remove the specified Provider from storage.",
+                                    "type": "string"
                                 },
                                 "message": {
+                                    "description": "Remove the specified Provider from storage.",
                                     "type": "string"
                                 }
                             },
                             "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Provider not found"
+                    }
+                },
+                "security": [
+                    {
+                        "jwt": []
+                    }
+                ]
+            }
+        },
+        "/sales": {
+            "get": {
+                "tags": [
+                    "Sale"
+                ],
+                "summary": "Get a listing of the Bookings.",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Sale"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stores": {
+            "get": {
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Get list of Stores",
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Store"
+                            }
                         }
                     }
                 }
             },
             "post": {
                 "tags": [
-                    "MembershipType"
+                    "Store"
                 ],
-                "summary": "Store a newly created MembershipType in storage",
-                "description": "Store MembershipType",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "MembershipType that should be stored",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/MembershipType"
-                        }
-                    }
-                ],
+                "summary": "Store a newly created Store in storage",
                 "responses": {
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/MembershipType"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/Store"
                         }
                     }
                 }
             }
         },
-        "/membershipTypes/{id}": {
+        "/stores/{id}": {
             "get": {
                 "tags": [
-                    "MembershipType"
+                    "Store"
                 ],
-                "summary": "Display the specified MembershipType",
-                "description": "Get MembershipType",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Display the specified Store",
+                "description": "Get Store by id",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of MembershipType",
+                        "description": "id of Store",
                         "required": true,
                         "type": "integer"
                     }
@@ -904,7 +1990,7 @@
                                     "type": "boolean"
                                 },
                                 "data": {
-                                    "$ref": "#/definitions/MembershipType"
+                                    "$ref": "#/definitions/Store"
                                 },
                                 "message": {
                                     "type": "string"
@@ -917,824 +2003,1112 @@
             },
             "put": {
                 "tags": [
-                    "MembershipType"
+                    "Store"
                 ],
-                "summary": "Update the specified MembershipType in storage",
-                "description": "Update MembershipType",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Update the specified Store in storage",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of MembershipType",
+                        "description": "id of Store",
                         "required": true,
                         "type": "integer"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "MembershipType that should be updated",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/MembershipType"
-                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "successful operation",
                         "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/MembershipType"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/definitions/Store"
                         }
                     }
                 }
             },
             "delete": {
                 "tags": [
-                    "MembershipType"
+                    "Store"
                 ],
-                "summary": "Remove the specified MembershipType from storage",
-                "description": "Delete MembershipType",
-                "produces": [
-                    "application/json"
-                ],
+                "summary": "Remove the specified Store from storage",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "id of MembershipType",
+                        "description": "id of Store",
                         "required": true,
                         "type": "integer"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/pays": {
-            "get": {
-                "tags": [
-                    "Pay"
-                ],
-                "summary": "Get a listing of the Pays.",
-                "description": "Get all Pays",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/Pay"
-                                    }
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Pay"
-                ],
-                "summary": "Store a newly created Pay in storage",
-                "description": "Store Pay",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "Pay that should be stored",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/Pay"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Pay"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/pays/{id}": {
-            "get": {
-                "tags": [
-                    "Pay"
-                ],
-                "summary": "Display the specified Pay",
-                "description": "Get Pay",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Pay",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Pay"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Pay"
-                ],
-                "summary": "Update the specified Pay in storage",
-                "description": "Update Pay",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Pay",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "Pay that should be updated",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/Pay"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/Pay"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Pay"
-                ],
-                "summary": "Remove the specified Pay from storage",
-                "description": "Delete Pay",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of Pay",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/userEntities": {
-            "get": {
-                "tags": [
-                    "User_entities"
-                ],
-                "summary": "Get a listing of the User_entities.",
-                "description": "Get all User_entities",
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/definitions/User_entities"
-                                    }
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "User_entities"
-                ],
-                "summary": "Store a newly created User_entities in storage",
-                "description": "Store User_entities",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "User_entities that should be stored",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/User_entities"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/User_entities"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/userEntities/{id}": {
-            "get": {
-                "tags": [
-                    "User_entities"
-                ],
-                "summary": "Display the specified User_entities",
-                "description": "Get User_entities",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of User_entities",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/User_entities"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "User_entities"
-                ],
-                "summary": "Update the specified User_entities in storage",
-                "description": "Update User_entities",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of User_entities",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "description": "User_entities that should be updated",
-                        "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/User_entities"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "$ref": "#/definitions/User_entities"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "User_entities"
-                ],
-                "summary": "Remove the specified User_entities from storage",
-                "description": "Delete User_entities",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "id of User_entities",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "properties": {
-                                "success": {
-                                    "type": "boolean"
-                                },
-                                "data": {
-                                    "type": "string"
-                                },
-                                "message": {
-                                    "type": "string"
-                                }
-                            },
-                            "type": "object"
-                        }
+                        "description": "successful operation"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "Affiliate": {
+        "LoginRequest": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "description": "User email address",
+                    "type": "string",
+                    "format": "email"
+                },
+                "password": {
+                    "description": "User password",
+                    "type": "string",
+                    "format": "password"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleSignInRequest": {
+            "required": [
+                "credential"
+            ],
+            "properties": {
+                "credential": {
+                    "description": "Google JWT credential",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuthResponse": {
+            "properties": {
+                "token": {
+                    "description": "JWT access token",
+                    "type": "string"
+                },
+                "token_type": {
+                    "description": "Token type",
+                    "type": "string",
+                    "example": "bearer"
+                },
+                "expires_in": {
+                    "description": "Token expiration time in seconds",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "Class AuthController",
+                    "properties": {
+                        "id": {
+                            "description": "Class AuthController",
+                            "type": "integer"
+                        },
+                        "name": {
+                            "description": "Class AuthController",
+                            "type": "string"
+                        },
+                        "email": {
+                            "description": "Class AuthController",
+                            "type": "string"
+                        },
+                        "logins": {
+                            "description": "Class AuthController",
+                            "type": "integer"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "User": {
+            "properties": {
+                "id": {
+                    "description": "User ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "User name",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "User email",
+                    "type": "string",
+                    "format": "email"
+                },
+                "google_id": {
+                    "description": "Google user ID",
+                    "type": "string"
+                },
+                "picture": {
+                    "description": "User profile picture URL",
+                    "type": "string"
+                },
+                "logins": {
+                    "description": "Login count",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Class AuthController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class AuthController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object"
+        },
+        "Image": {
+            "properties": {
+                "id": {
+                    "description": "Image ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "src": {
+                    "description": "Image source path",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Image title",
+                    "type": "string"
+                },
+                "product_id": {
+                    "description": "Associated product ID",
+                    "type": "integer"
+                },
+                "benefit_id": {
+                    "description": "Associated benefit ID",
+                    "type": "integer"
+                },
+                "store_id": {
+                    "description": "Associated store ID",
+                    "type": "integer"
+                },
+                "activity_id": {
+                    "description": "Associated activity ID",
+                    "type": "integer"
+                },
+                "event_id": {
+                    "description": "Associated event ID",
+                    "type": "integer"
+                },
+                "primary": {
+                    "description": "Is primary image (0 or 1)",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "Class ImageAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ImageAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Image"
+            }
+        },
+        "ImageFeatures": {
+            "properties": {
+                "brand": {
+                    "description": "Detected brand",
+                    "type": "string"
+                },
+                "model": {
+                    "description": "Detected model",
+                    "type": "string"
+                },
+                "color": {
+                    "description": "Detected color",
+                    "type": "string"
+                },
+                "condition": {
+                    "description": "Detected condition",
+                    "type": "string"
+                },
+                "category": {
+                    "description": "Detected category",
+                    "type": "string"
+                },
+                "confidence": {
+                    "description": "Confidence score",
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object"
+        },
+        "PriceSuggestion": {
+            "properties": {
+                "min_price": {
+                    "description": "Minimum suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "max_price": {
+                    "description": "Maximum suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "avg_price": {
+                    "description": "Average suggested price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "currency": {
+                    "description": "Currency code",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Product": {
+            "properties": {
+                "id": {
+                    "description": "Product ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "code": {
+                    "description": "Product code",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Product title",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Product description",
+                    "type": "string"
+                },
+                "store_id": {
+                    "description": "Store ID",
+                    "type": "integer"
+                },
+                "provider_id": {
+                    "description": "Provider ID",
+                    "type": "integer"
+                },
+                "category_id": {
+                    "description": "Category ID",
+                    "type": "integer"
+                },
+                "state_id": {
+                    "description": "Product state ID",
+                    "type": "integer"
+                },
+                "color": {
+                    "description": "Product color",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Product size",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "Product price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "cost": {
+                    "description": "Product cost",
+                    "type": "number",
+                    "format": "float"
+                },
+                "fee": {
+                    "description": "Product fee",
+                    "type": "number",
+                    "format": "float"
+                },
+                "created_at": {
+                    "description": "Class ProductAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ProductAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Product"
+            }
+        },
+        "ProductRequest": {
+            "required": [
+                "code",
+                "store_id"
+            ],
+            "properties": {
+                "code": {
+                    "description": "Product code",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Product title",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Product description",
+                    "type": "string"
+                },
+                "store_id": {
+                    "description": "Store ID",
+                    "type": "integer"
+                },
+                "provider_id": {
+                    "description": "Provider ID",
+                    "type": "integer"
+                },
+                "category_id": {
+                    "description": "Category ID",
+                    "type": "integer"
+                },
+                "state_id": {
+                    "description": "Product state ID",
+                    "type": "integer"
+                },
+                "color": {
+                    "description": "Product color",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Product size",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "Product price",
+                    "type": "number",
+                    "format": "float"
+                },
+                "cost": {
+                    "description": "Product cost",
+                    "type": "number",
+                    "format": "float"
+                },
+                "fee": {
+                    "description": "Product fee",
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "ProductRequest"
+            }
+        },
+        "Provider": {
+            "properties": {
+                "id": {
+                    "description": "Provider ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "name": {
+                    "description": "Provider name",
+                    "type": "string"
+                },
+                "cuil": {
+                    "description": "Provider CUIL",
+                    "type": "string"
+                },
+                "contact_name": {
+                    "description": "Contact name",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Provider email",
+                    "type": "string"
+                },
+                "address": {
+                    "description": "Provider address",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "Provider token",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Provider password",
+                    "type": "string"
+                },
+                "city_id": {
+                    "description": "City ID",
+                    "type": "integer"
+                },
+                "phone": {
+                    "description": "Provider phone",
+                    "type": "string"
+                },
+                "fee": {
+                    "description": "Provider fee",
+                    "type": "integer"
+                },
+                "alias": {
+                    "description": "Provider alias",
+                    "type": "string"
+                },
+                "bank": {
+                    "description": "Provider bank",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "Class ProviderAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "description": "Class ProviderAPIController",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            },
+            "type": "object",
+            "xml": {
+                "name": "Provider"
+            }
+        },
+        "ProviderRequest": {
             "required": [
                 "name",
-                "date_start",
-                "birthday",
-                "address",
-                "gender"
+                "email"
             ],
             "properties": {
-                "id": {
-                    "description": "id",
-                    "type": "integer",
-                    "format": "int32"
-                },
                 "name": {
-                    "description": "name",
+                    "description": "Provider name",
                     "type": "string"
                 },
-                "date_start": {
-                    "description": "date_start",
-                    "type": "string",
-                    "format": "date"
-                },
-                "birthday": {
-                    "description": "birthday",
-                    "type": "string",
-                    "format": "date"
-                },
-                "address": {
-                    "description": "address",
+                "cuil": {
+                    "description": "Provider CUIL",
                     "type": "string"
                 },
-                "gender": {
-                    "description": "gender",
+                "contact_name": {
+                    "description": "Contact name",
                     "type": "string"
                 },
-                "created_at": {
-                    "description": "created_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "deleted_at": {
-                    "description": "deleted_at",
-                    "type": "string",
-                    "format": "date-time"
-                }
-            }
-        },
-        "City": {
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "id": {
-                    "description": "id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "name": {
-                    "description": "name",
-                    "type": "string"
-                },
-                "province": {
-                    "description": "province",
-                    "type": "string"
-                },
-                "country": {
-                    "description": "country",
-                    "type": "string"
-                },
-                "created_at": {
-                    "description": "created_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "deleted_at": {
-                    "description": "deleted_at",
-                    "type": "string",
-                    "format": "date-time"
-                }
-            }
-        },
-        "Entity": {
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "id": {
-                    "description": "id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "name": {
-                    "description": "name",
+                "email": {
+                    "description": "Provider email",
                     "type": "string"
                 },
                 "address": {
-                    "description": "address",
+                    "description": "Provider address",
                     "type": "string"
                 },
-                "logo": {
-                    "description": "logo",
+                "token": {
+                    "description": "Provider token",
                     "type": "string"
                 },
-                "state": {
-                    "description": "state",
+                "password": {
+                    "description": "Provider password",
                     "type": "string"
                 },
-                "created_at": {
-                    "description": "created_at",
-                    "type": "string",
-                    "format": "date-time"
+                "city_id": {
+                    "description": "City ID",
+                    "type": "integer"
                 },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
+                "phone": {
+                    "description": "Provider phone",
+                    "type": "string"
+                },
+                "fee": {
+                    "description": "Provider fee",
+                    "type": "integer"
+                },
+                "alias": {
+                    "description": "Provider alias",
+                    "type": "string"
+                },
+                "bank": {
+                    "description": "Provider bank",
+                    "type": "string"
                 }
+            },
+            "type": "object",
+            "xml": {
+                "name": "ProviderRequest"
             }
         },
-        "Membership": {
+        "Account": {
             "required": [
-                ""
+                "first_name",
+                "last_name",
+                "email"
             ],
             "properties": {
                 "id": {
-                    "description": "id",
+                    "description": "Account id",
                     "type": "integer",
                     "format": "int32"
                 },
-                "affiliate_id": {
-                    "description": "affiliate_id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "date_ini": {
-                    "description": "date_ini",
-                    "type": "string",
-                    "format": "date"
-                },
-                "date_end": {
-                    "description": "date_end",
-                    "type": "string",
-                    "format": "date"
-                },
-                "state": {
-                    "description": "state",
+                "first_name": {
+                    "description": "First name",
                     "type": "string"
                 },
-                "user_created_id": {
-                    "description": "user_created_id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "entity_id": {
-                    "description": "entity_id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "membership_type_id": {
-                    "description": "membership_type_id",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "memeber_code": {
-                    "description": "memeber_code",
+                "last_name": {
+                    "description": "Last name",
                     "type": "string"
                 },
-                "active": {
-                    "description": "active",
+                "activated": {
+                    "description": "Activated status",
                     "type": "boolean"
                 },
-                "created_at": {
-                    "description": "created_at",
+                "email": {
+                    "description": "Email address",
+                    "type": "string"
+                },
+                "langKey": {
+                    "description": "Language key",
+                    "type": "string"
+                },
+                "city_id": {
+                    "description": "City id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "gender": {
+                    "description": "Gender",
+                    "type": "string"
+                },
+                "image_url": {
+                    "description": "Image URL",
+                    "type": "string"
+                },
+                "dni": {
+                    "description": "Document number",
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "User id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "address": {
+                    "description": "Account address",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "Phone number",
+                    "type": "string"
+                },
+                "birthday": {
+                    "description": "Birthday",
                     "type": "string",
                     "format": "date-time"
                 },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
+                "account_cod": {
+                    "description": "Account code",
+                    "type": "string"
                 }
             }
         },
-        "MembershipType": {
+        "Category": {
             "required": [
-                ""
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Category id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "name": {
+                    "description": "Category name",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Category description",
+                    "type": "string"
+                },
+                "category_id": {
+                    "description": "Parent category id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "color": {
+                    "description": "Category color",
+                    "type": "string"
+                }
+            }
+        },
+        "Coupon": {
+            "required": [
+                "hotel_id",
+                "code",
+                "description",
+                "limit_discount",
+                "accommodation_type_id",
+                "discount",
+                "date_to",
+                "state"
             ],
             "properties": {
                 "id": {
                     "description": "id",
                     "type": "integer",
                     "format": "int32"
+                },
+                "hotel_id": {
+                    "description": "hotel_id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "code": {
+                    "description": "code",
+                    "type": "string"
                 },
                 "description": {
                     "description": "description",
-                    "type": "integer",
-                    "format": "int32"
+                    "type": "string"
                 },
-                "amount": {
-                    "description": "amount",
+                "limit_discount": {
+                    "description": "limit_discount",
                     "type": "number",
                     "format": "number"
                 },
-                "family_members": {
-                    "description": "family_members",
+                "accommodation_type_id": {
+                    "description": "accommodation_type_id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "discount": {
+                    "description": "discount",
+                    "type": "number",
+                    "format": "number"
+                },
+                "date_to": {
+                    "description": "date_to",
+                    "type": "string",
+                    "format": "date"
+                },
+                "state": {
+                    "description": "state",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "created_at",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "updated_at": {
+                    "description": "updated_at",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "deleted_at": {
+                    "description": "deleted_at",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "Discount": {
+            "required": [
+                "store_id",
+                "date_from",
+                "date_to",
+                "description",
+                "discount"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Discount id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "store_id": {
+                    "description": "Store id",
                     "type": "integer",
                     "format": "int32"
                 },
                 "date_from": {
-                    "description": "date_from",
+                    "description": "Discount start date",
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date"
                 },
-                "date_end": {
-                    "description": "date_end",
+                "date_to": {
+                    "description": "Discount end date",
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date"
                 },
-                "entity_id": {
-                    "description": "entity_id",
+                "description": {
+                    "description": "Discount description",
+                    "type": "string"
+                },
+                "limit_discount": {
+                    "description": "Limit discount",
+                    "type": "number",
+                    "format": "double"
+                },
+                "category_id": {
+                    "description": "Category id",
                     "type": "integer",
                     "format": "int32"
                 },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
+                "product_id": {
+                    "description": "Product id",
+                    "type": "integer",
+                    "format": "int32"
                 },
-                "deleted_at": {
-                    "description": "deleted_at",
-                    "type": "string",
-                    "format": "date-time"
+                "discount": {
+                    "description": "Discount amount",
+                    "type": "number",
+                    "format": "double"
                 },
-                "created_at": {
-                    "description": "created_at",
-                    "type": "string",
-                    "format": "date-time"
+                "active": {
+                    "description": "Active flag",
+                    "type": "boolean"
                 }
             }
         },
-        "Pay": {
+        "PayItem": {
             "required": [
-                ""
+                "date"
             ],
             "properties": {
                 "id": {
-                    "description": "id",
+                    "description": "PayItem id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "concept": {
+                    "description": "Concept",
+                    "type": "string"
+                },
+                "date": {
+                    "description": "Date",
+                    "type": "string",
+                    "format": "date"
+                },
+                "paid": {
+                    "description": "Paid flag",
+                    "type": "boolean"
+                },
+                "amount": {
+                    "description": "Amount",
+                    "type": "number",
+                    "format": "double"
+                },
+                "ref_id": {
+                    "description": "Reference id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "payment_id": {
+                    "description": "Payment id",
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "Payment": {
+            "required": [
+                "pay_date",
+                "sale_id",
+                "amount",
+                "user_id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Payment id",
                     "type": "integer",
                     "format": "int32"
                 },
                 "pay_date": {
-                    "description": "pay_date",
+                    "description": "Payment date",
                     "type": "string",
                     "format": "date-time"
                 },
+                "sale_id": {
+                    "description": "Sale id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "note": {
+                    "description": "Note",
+                    "type": "string"
+                },
+                "amount": {
+                    "description": "Amount",
+                    "type": "number",
+                    "format": "double"
+                },
+                "discount": {
+                    "description": "Discount amount",
+                    "type": "number",
+                    "format": "double"
+                },
+                "total": {
+                    "description": "Total amount",
+                    "type": "number",
+                    "format": "double"
+                },
+                "coupon_code": {
+                    "description": "Coupon code",
+                    "type": "string"
+                },
+                "payment_type_id": {
+                    "description": "Payment type id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "payment_state_id": {
+                    "description": "Payment state id",
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "user_id": {
-                    "description": "user_id",
+                    "description": "User id",
                     "type": "integer",
                     "format": "int32"
                 },
                 "pay_method": {
-                    "description": "pay_method",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "pay_ref": {
-                    "description": "pay_ref",
+                    "description": "Pay method",
                     "type": "string"
                 },
-                "member_id": {
-                    "description": "member_id",
+                "pay_ref": {
+                    "description": "Payment reference",
+                    "type": "string"
+                },
+                "store_id": {
+                    "description": "Store id",
                     "type": "integer",
                     "format": "int32"
                 },
-                "amount": {
-                    "description": "amount",
-                    "type": "number",
-                    "format": "number"
-                },
-                "updated_at": {
-                    "description": "updated_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "deleted_at": {
-                    "description": "deleted_at",
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "created_at": {
-                    "description": "created_at",
-                    "type": "string",
-                    "format": "date-time"
+                "bank_account_id": {
+                    "description": "Bank account id",
+                    "type": "integer",
+                    "format": "int32"
                 }
             }
         },
-        "User_entities": {
+        "PaymentItem": {
             "required": [
-                ""
+                "payment_id",
+                "amount"
             ],
             "properties": {
                 "id": {
-                    "description": "id",
                     "type": "integer",
-                    "format": "int32"
+                    "format": "int64"
                 },
-                "role": {
-                    "description": "role",
+                "payment_id": {
+                    "type": "integer"
+                },
+                "concept": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "PaymentState": {
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "active": {
-                    "description": "active",
                     "type": "boolean"
+                }
+            }
+        },
+        "PaymentType": {
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Payment type id",
+                    "type": "integer",
+                    "format": "int32"
                 },
-                "created_at": {
-                    "description": "created_at",
+                "name": {
+                    "description": "Payment type name",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Payment type description",
+                    "type": "string"
+                },
+                "active": {
+                    "description": "Payment type active flag",
+                    "type": "string"
+                }
+            }
+        },
+        "Sale": {
+            "required": [
+                "store_id",
+                "sale_state_id",
+                "date_sale",
+                "total_price"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Sale id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "store_id": {
+                    "description": "Store id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "customer_id": {
+                    "description": "Customer id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "sale_state_id": {
+                    "description": "Sale state id",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "date_sale": {
+                    "description": "Sale date",
                     "type": "string",
                     "format": "date-time"
                 },
-                "updated_at": {
-                    "description": "updated_at",
+                "date_pay": {
+                    "description": "Payment date",
                     "type": "string",
                     "format": "date-time"
+                },
+                "note": {
+                    "description": "Sale note",
+                    "type": "string"
+                },
+                "total_price": {
+                    "description": "Total price",
+                    "type": "number",
+                    "format": "double"
+                },
+                "coupon_code": {
+                    "description": "Coupon code",
+                    "type": "string"
+                },
+                "days_to_confirm": {
+                    "description": "Days to confirm",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "days_to_cancel": {
+                    "description": "Days to cancel",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "user": {
+                    "description": "User name",
+                    "type": "string"
+                },
+                "code": {
+                    "description": "Sale code",
+                    "type": "string"
+                }
+            }
+        },
+        "Store": {
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "latitud": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "longitud": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "city_id": {
+                    "type": "integer"
+                },
+                "owner_id": {
+                    "type": "integer"
+                },
+                "facebook": {
+                    "type": "string"
+                },
+                "instagram": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "logo": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "StoreDiscount": {
+            "required": [
+                "sale_id",
+                "description",
+                "discount"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "sale_id": {
+                    "type": "integer"
+                },
+                "discount_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "number",
+                    "format": "double"
                 }
             }
         }

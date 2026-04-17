@@ -53,6 +53,14 @@ class AIService
                 Log::error('Failed to read image file for feature extraction.', ['path' => $storagePath]);
                 return ['error' => 'Failed to read image file.', 'estimation_basis' => 'error_file_read'];
             }
+
+            // Check image size (Gemini has limits)
+            $imageSize = strlen($imageData);
+            if ($imageSize > 20 * 1024 * 1024) { // 20MB limit
+                Log::error('Image file too large for Gemini API.', ['path' => $storagePath, 'size' => $imageSize]);
+                return ['error' => 'Image file is too large for AI processing.', 'estimation_basis' => 'error_file_too_large'];
+            }
+
             $base64ImageData = base64_encode($imageData);
             $mimeType = Storage::disk('public')->mimeType($storagePath);
 
@@ -62,12 +70,24 @@ class AIService
                 return ['error' => 'Could not determine image MIME type.', 'estimation_basis' => 'error_mime_type'];
             }
 
-            $prompt = "Analyze this image of a garment and extract its primary color,
-            type of garment (e.g., shirt, pants, dress),
-            and its perceived condition (e.g., new, good, fair, poor).
-            Return the answer as a JSON object with keys 'color', 'type', and 'condition'.";
 
-            $geminiVisionEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent";
+            $prompt = "**Prompt mejorado:**
+Analiza esta imagen de una prenda de vestir y extrae las siguientes características. Devuelve **ÚNICAMENTE** un objeto JSON válido con estas claves exactas: 
+`'title'`, `'color'`, `'brand'`, `'category'`, `'condition'`, `'description'`. No incluyas ningún otro texto, explicación o formato adicional.
+Instrucciones:
+- title: Un nombre breve y descriptivo para la prenda (ej. 'Chaqueta vaquera azul').
+- color: El color dominante (ej. 'rojo', 'azul', 'negro', 'blanco', 'verde', 'gris', 'marrón', 'beige', 'amarillo', 'naranja', 'rosa', 'morado'). Usa solo una palabra.
+- brand: Si es identificable (logotipo, etiqueta, nombre visible), escríbela tal como aparece. Si no se puede identificar, usa `null`.
+- category: Categoría general (ej. 'camisa', 'pantalón', 'vestido', 'chaqueta', 'zapatos', 'suéter', 'falda', 'abrigo', 'bufanda', 'gorra').
+- condition: Una de estas opciones: `'nueva'`, `'buena'`, `'regular'`, `'mala'`, `'dañada'`. Evalúa el desgaste, manchas, roturas o aspecto general.
+- description: Frase corta (máximo 15 palabras) que describa el estilo (casual, elegante, deportivo), patrón (liso, rayas, cuadros, estampado floral) y cualquier detalle notable (cierres, bolsillos, cuello, mangas, etc.).
+Ejemplo de salida esperada: json
+{'title':'Chaqueta vaquera azul','color':'azul','brand':'Levi\'s','category':'chaqueta','condition':'buena','description':'Estilo casual, denim, botones metálicos y dos bolsillos delanteros.'}
+";
+
+
+            $model = "gemini-2.5-flash"; // Adjust model name/version as needed based on availability and requirements
+            $geminiVisionEndpoint = "https://generativelanguage.googleapis.com/v1/models/" . $model . ":generateContent";
 
             $json_payload = [
                 'contents' => [
@@ -82,14 +102,14 @@ class AIService
                             ]
                         ]
                     ]
-                ],
-                // 'generationConfig' => [ 'response_mime_type' => 'application/json' ] // If supported
+                ]
             ];
 
             $response = Http::timeout(60) // Increased timeout for image uploads
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                 ])
+                ->withoutVerifying() // Disable SSL verification for development
                 ->post($geminiVisionEndpoint . '?key=' . $apiKey, $json_payload);
 
             if ($response->failed()) {
@@ -106,31 +126,46 @@ class AIService
             if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
                 $jsonText = $responseData['candidates'][0]['content']['parts'][0]['text'];
                 $jsonText = trim($jsonText);
+
+                // Remove markdown code blocks if present
                 if (strpos($jsonText, '```json') === 0) {
                     $jsonText = str_replace('```json', '', $jsonText);
                     $jsonText = rtrim($jsonText, '`');
+                } elseif (strpos($jsonText, '```') === 0) {
+                    $jsonText = str_replace('```', '', $jsonText);
                 }
                 $jsonText = trim($jsonText);
 
                 $extractedFeaturesData = json_decode($jsonText, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
-                    Log::error('Gemini Vision API response parsing error: Invalid JSON in text part.', ['text_part' => $jsonText, 'original_response_snippet' => substr(is_string($responseData) ? $responseData : json_encode($responseData), 0, 500)]);
+                    Log::error('Gemini Vision API response parsing error: Invalid JSON in text part.', [
+                        'text_part' => $jsonText,
+                        'json_error' => json_last_error_msg(),
+                        'original_response' => $responseData
+                    ]);
                     return ['error' => 'Invalid response format from AI Vision service.', 'estimation_basis' => 'error_vision_parsing'];
                 }
             } else {
-                Log::error('Gemini Vision API response parsing error: Expected JSON data not found.', ['response_body' => $responseData]);
+                Log::error('Gemini Vision API response parsing error: Expected JSON data not found.', [
+                    'response_body' => $responseData,
+                    'candidates_exists' => isset($responseData['candidates']),
+                    'content_exists' => isset($responseData['candidates'][0]['content'])
+                ]);
                 return ['error' => 'Unexpected response structure from AI Vision service.', 'estimation_basis' => 'error_vision_parsing_structure'];
             }
 
-            if (!isset($extractedFeaturesData['color']) || !isset($extractedFeaturesData['type']) || !isset($extractedFeaturesData['condition'])) {
+            if (!isset($extractedFeaturesData['title']) || !isset($extractedFeaturesData['color']) || !isset($extractedFeaturesData['category']) || !isset($extractedFeaturesData['condition'])) {
                 Log::error('Gemini Vision API response error: Missing feature data in response.', ['parsed_data' => $extractedFeaturesData]);
                 return ['error' => 'AI Vision service did not return expected feature data.', 'estimation_basis' => 'error_vision_incomplete_data'];
             }
 
             return [
+                'title' => $extractedFeaturesData['title'],
                 'color' => $extractedFeaturesData['color'],
-                'type' => $extractedFeaturesData['type'],
+                'brand' => $extractedFeaturesData['brand'] ?? null,
+                'category' => $extractedFeaturesData['category'],
                 'condition' => $extractedFeaturesData['condition'],
+                'description' => $extractedFeaturesData['description'] ?? null,
                 'estimation_basis' => 'gemini_vision_api',
                 // 'raw_response' => $responseData // Optional for debugging
             ];

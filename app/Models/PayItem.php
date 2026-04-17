@@ -10,7 +10,48 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @SWG\Definition(
  *      definition="PayItem",
  *      required={"date"},
-
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="PayItem id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="concept",
+ *          description="Concept",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="date",
+ *          description="Date",
+ *          type="string",
+ *          format="date"
+ *      ),
+ *      @SWG\Property(
+ *          property="paid",
+ *          description="Paid flag",
+ *          type="boolean"
+ *      ),
+ *      @SWG\Property(
+ *          property="amount",
+ *          description="Amount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="ref_id",
+ *          description="Reference id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="payment_id",
+ *          description="Payment id",
+ *          type="integer",
+ *          format="int32"
+ *      )
+ * )
  */
 class PayItem extends Model
 {
@@ -63,5 +104,4 @@ class PayItem extends Model
     {
         return $this->belongsTo('App\Models\Pay');
     }
-
 }

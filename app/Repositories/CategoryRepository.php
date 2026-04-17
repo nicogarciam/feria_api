@@ -24,10 +24,8 @@ class CategoryRepository extends BaseRepository
     ];
 
     protected $fieldLikeable = [
-        'firstName',
-        'lastName',
-        'email',
-        'dni'
+        'name',
+        'description',
     ];
 
 
@@ -53,26 +51,4 @@ class CategoryRepository extends BaseRepository
     {
         return Category::class;
     }
-
-    public function findForGrid($hotelId, $typesIds = null)
-    {
-
-
-        $typesQuery = $this->model->newQuery();
-
-        if ($hotelId) {
-            $typesQuery->where('hotel_id' , $hotelId);
-        }
-
-        if ($typesIds && sizeof($typesIds) > 0  && !empty($typesIds[0])) {
-            $typesQuery->whereIn('id', $typesIds);
-        }
-
-        $accommTypes = $typesQuery->get();
-
-
-        return $accommTypes;
-
-    }
-
 }

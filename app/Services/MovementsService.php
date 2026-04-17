@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Movement;
 use App\Models\Provider;
 use App\Repositories\MovementRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -56,11 +57,12 @@ class MovementsService
         $movement->sale_id = $sale->id;
         $movement->store_id = $product['store_id'];
         $movement->provider_id = $product['provider_id'];
-        $movement->date = $sale->date_sale;
+        $movement->date = Carbon::today() ;
         $fee = $product['fee'] ?? Provider::where('id',$product['provider_id'])->first()->fee;
+        $price = $product['pivot']['price'] ?? $product['price'];
         $movement->concept = 'SALE - cod: ' . $product['code'] . ' ' . $fee .
-            ' % de $' . number_format($product['price'],2) ;
-        $movement->amount = $product['price'] * (1 - $fee);
+            ' % de $' . number_format($price,2) ;
+        $movement->amount = $price * (1 - $fee);
         $movement->type = 'CREDIT';
         $movement->user = $sale->user;
         $movement->state = 'CREATED';

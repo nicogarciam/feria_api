@@ -91,6 +91,58 @@ class SaleRepository extends BaseRepository
         return $query->get();
     }
 
+    public function allSalesQueryLike($search, $date_from, $date_to, $storeId)
+    {
+        $query = $this->model->newQuery()
+            ->search($search);
+
+        if (!is_null($storeId)) {
+            $query->where('store_id', $storeId);
+        }
+
+        if (!is_null($date_from)) {
+            $query->where('date_sale', '>', $date_from);
+        }
+
+        if (!is_null($date_to)) {
+            $query->where('date_sale', '<', $date_to);
+        }
+
+        return $query->get();
+    }
+
+    public function allSalesQueryLikeWithSort($search, $date_from, $date_to, $storeId, $orders = null)
+    {
+        $query = $this->model->newQuery()
+            ->search($search);
+
+        if (!is_null($storeId)) {
+            $query->where('store_id', $storeId);
+        }
+
+        if (!is_null($date_from)) {
+            $query->where('date_sale', '>', $date_from);
+        }
+
+        if (!is_null($date_to)) {
+            $query->where('date_sale', '<', $date_to);
+        }
+
+        // Handle sorting
+        if ($orders) {
+            foreach ($orders as $order) {
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        return $query;
+    }
+
     public function generateCode($sale) {
 
         $saleCode = new SaleCode();

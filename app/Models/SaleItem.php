@@ -27,6 +27,10 @@ class SaleItem extends Model
         'sale_id',
         'product_id',
         'price',
+        'settled',
+        'settlement_id',
+        'status',
+        'quantity'
     ];
 
     /**
@@ -37,7 +41,9 @@ class SaleItem extends Model
     protected $casts = [
         'id' => 'integer',
         'sale_id' => 'integer',
-        'product_id' => 'integer'
+        'product_id' => 'integer',
+        'settled' => 'boolean',
+        'settlement_id' => 'integer'
     ];
 
     /**
@@ -57,6 +63,16 @@ class SaleItem extends Model
     public function product()
     {
         return $this->belongsTo('App\Models\Product');
+    }
+
+    public function settlement()
+    {
+        return $this->belongsTo('App\Models\Settlement');
+    }
+
+    public function settlementDetail()
+    {
+        return $this->hasOne('App\Models\SettlementDetail');
     }
 
 }

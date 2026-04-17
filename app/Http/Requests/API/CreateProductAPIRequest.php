@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\API;
 
-use App\Models\Accommodation;
+use App\Models\Product;
 use InfyOm\Generator\Request\APIRequest;
 
 class CreateProductAPIRequest extends APIRequest
@@ -24,6 +24,6 @@ class CreateProductAPIRequest extends APIRequest
      */
     public function rules()
     {
-        return Accommodation::$rules;
+        return Product::$rules;
     }
 }

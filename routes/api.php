@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\API\CategoryAPIController;
 use App\Http\Controllers\API\ImageAPIController;
 use App\Http\Controllers\API\MovementAPIController;
 use App\Http\Controllers\API\PaymentAPIController;
 use App\Http\Controllers\API\ProductAPIController;
+use App\Http\Controllers\API\ProviderAPIController;
 use App\Http\Controllers\API\SaleAPIController;
 use App\Http\Controllers\API\SaleStateAPIController;
 use App\Http\Controllers\API\StoreAPIController;
+use App\Http\Controllers\API\SettlementAPIController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +29,9 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::get('certificados', 'App\Http\Controllers\API\ProductAPIController@index');
+
+Route::get('test', 'App\Http\Controllers\API\AuthController@test');
+
 
 Route::group([
     'prefix' => 'auth'
@@ -52,31 +58,43 @@ Route::group([
 
     Route::get('my_stores',[StoreAPIController::class,'myStores']);
 
+
+    Route::get('providers/pending-settlement', [SettlementAPIController::class, 'providersPendingSettlement']);
+    Route::get('providers/{providerId}/stores/{storeId}/stats', [ProviderAPIController::class, 'stats']);
+
     Route::get('stores/select/{storeId}', [StoreAPIController::class,'selectStore']);
     Route::post('stores/upload_logo',[StoreAPIController::class,'updateLogo']);
+
+    // Store User Management
+    Route::get('stores/{id}/users', [\App\Http\Controllers\API\StoreUserAPIController::class, 'index']);
+    Route::post('stores/{id}/users', [\App\Http\Controllers\API\StoreUserAPIController::class, 'store']);
+    Route::put('stores/{id}/users/{userId}', [\App\Http\Controllers\API\StoreUserAPIController::class, 'update']);
+    Route::delete('stores/{id}/users/{userId}', [\App\Http\Controllers\API\StoreUserAPIController::class, 'destroy']);
 
     Route::get('my_account','App\Http\Controllers\API\AccountAPIController@myAccount');
 
     Route::post('accounts/balance',[MovementAPIController::class,'balance']);
 
-    Route::get('store/{storeId}/categories',
-        'App\Http\Controllers\API\CategoryAPIController@findByStore');
+    Route::get('stores/{storeId}/categories', [CategoryAPIController::class,'findByStore']);
 
-    Route::get('store/{storeId}/products',[ProductAPIController::class,'findByStore'] );
+    Route::get('stores/{storeId}/products',[ProductAPIController::class,'findByStore'] );
+    Route::get('stores/{storeId}/borrowed_products', [ProductAPIController::class, 'borrowedProducts']);
 
-    Route::get('store/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
+    Route::get('stores/{storeId}/products/{type}', [ProductAPIController::class,'findByStore']);
 
 
     Route::get('stores/{storeId}/sale_states', [SaleStateAPIController::class,'findByStore'] );
 
+    Route::post('products/bulk', [ProductAPIController::class, 'bulkStore']);
+    Route::get('products/query',[ProductAPIController::class,'query'] );
 
     Route::post('images/upload',[ImageAPIController::class, 'uploadImage']);
     Route::post('images/product/{productId}/upload',[ImageAPIController::class, 'uploadProductImage']);
-    Route::post('images/upload_general','App\Http\Controllers\API\ImageAPIController@uploadImageGeneral');
-    Route::post('images/{id}/extract_features','App\Http\Controllers\API\ImageAPIController@extractFeatures');
-    Route::post('images/{id}/suggest_price', 'App\Http\Controllers\API\ImageAPIController@suggestPrice'); // New route
-    Route::delete('images/delete/{id}','App\Http\Controllers\API\ImageAPIController@delete');
-    Route::put('images/set_primary','App\Http\Controllers\API\ImageAPIController@set_primary');
+    Route::post('images/upload_general',[ImageAPIController::class, 'uploadImageGeneral']);
+    Route::post('images/{id}/extract_features',[ImageAPIController::class, 'extractFeatures']);
+    Route::post('images/{id}/suggest_price', [ImageAPIController::class, 'suggestPrice']); // New route
+    Route::delete('images/delete/{id}',[ImageAPIController::class, 'delete']);
+    Route::post('images/set_primary',[ImageAPIController::class, 'set_primary']);
 
 
     Route::get('sales/resume', [SaleAPIController::class,'countResume']);
@@ -88,6 +106,10 @@ Route::group([
 
     Route::get('sales/{saleId}/statuses', [SaleStateAPIController::class,'findSaleHistoric'] );
 
+    // Settlement routes
+    Route::get('settlements/preview', [SettlementAPIController::class, 'preview']);
+
+    Route::put('settlements/{id}/pay', [SettlementAPIController::class, 'markAsPaid']);
 
 //    RESOURCES
     Route::resource('movements', App\Http\Controllers\API\MovementAPIController::class);
@@ -123,6 +145,8 @@ Route::group([
     Route::resource('providers', App\Http\Controllers\API\ProviderAPIController::class);
 
     Route::resource('product_state', App\Http\Controllers\API\ProductStateAPIController::class);
+
+    Route::resource('settlements', App\Http\Controllers\API\SettlementAPIController::class);
 
 });
 

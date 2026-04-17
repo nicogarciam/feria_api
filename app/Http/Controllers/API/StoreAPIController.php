@@ -37,7 +37,17 @@ class StoreAPIController extends AppBaseController
      *
      * @SWG\Get(
      *      path="/stores",
-
+     *      summary="Get list of Stores",
+     *      tags={"Store"},
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/Store")
+     *          )
+     *      )
+     * )
      */
     public function index(Request $request)
     {
@@ -61,11 +71,17 @@ class StoreAPIController extends AppBaseController
      *      path="/stores",
      *      summary="Store a newly created Store in storage",
      *      tags={"Store"},
-
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(ref="#/definitions/Store")
+     *      )
+     * )
      */
     public function store(CreateStoreAPIRequest $request)
     {
         $input = $request->all();
+        $input['city_id'] = $input['city_id'] ?? 1;
 
         $store = $this->storeRepository->create($input);
 
@@ -83,6 +99,34 @@ class StoreAPIController extends AppBaseController
      * @SWG\Get(
      *      path="/stores/{id}",
      *      summary="Display the specified Store",
+     *      tags={"Store"},
+     *      description="Get Store by id",
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Store",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(
+     *                  property="success",
+     *                  type="boolean"
+     *              ),
+     *              @SWG\Property(
+     *                  property="data",
+     *                  ref="#/definitions/Store"
+     *              ),
+     *              @SWG\Property(
+     *                  property="message",
+     *                  type="string"
+     *              )
+     *          )
+     *      )
      * )
      */
     public function show($id)
@@ -100,7 +144,6 @@ class StoreAPIController extends AppBaseController
             return $this->sendError('Store not found');
         }
         return response()->json($store);
-//        return $this->sendResponse(new StoreResource($store), 'Store retrieved successfully');
     }
 
 
@@ -112,7 +155,20 @@ class StoreAPIController extends AppBaseController
      * @SWG\Put(
      *      path="/stores/{id}",
      *      summary="Update the specified Store in storage",
-
+     *      tags={"Store"},
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Store",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @SWG\Schema(ref="#/definitions/Store")
+     *      )
+     * )
      */
     public function update($id, UpdateStoreAPIRequest $request)
     {
@@ -145,6 +201,19 @@ class StoreAPIController extends AppBaseController
      * @SWG\Delete(
      *      path="/stores/{id}",
      *      summary="Remove the specified Store from storage",
+     *      tags={"Store"},
+     *      @SWG\Parameter(
+     *          name="id",
+     *          description="id of Store",
+     *          required=true,
+     *          type="integer",
+     *          in="path"
+     *      ),
+     *      @SWG\Response(
+     *          response=200,
+     *          description="successful operation"
+     *      )
+     * )
      */
     public function destroy($id)
     {
@@ -153,7 +222,6 @@ class StoreAPIController extends AppBaseController
         if (!$valid) {
             return $this->sendError('unauthorized.store','403');
         }
-
         /** @var Store $store */
         $store = $this->storeRepository->find($id);
 
@@ -239,3 +307,4 @@ class StoreAPIController extends AppBaseController
 
 
 }
+

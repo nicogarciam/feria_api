@@ -128,7 +128,10 @@ class MovementRepository extends BaseRepository
 
         if ($orders) {
             foreach ($orders as $order) {
-                $query->orderBy($order);
+                $parts = explode(',', $order);
+                if (count($parts) === 2) {
+                    $query->orderBy($parts[0], $parts[1]);
+                }
             }
         } else {
             $query->orderBy('date');

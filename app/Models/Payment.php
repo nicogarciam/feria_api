@@ -9,6 +9,95 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 /**
  * @SWG\Definition(
  *      definition="Payment",
+ *      required={"pay_date", "sale_id", "amount", "user_id"},
+ *
+ *      @SWG\Property(
+ *          property="id",
+ *          description="Payment id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="pay_date",
+ *          description="Payment date",
+ *          type="string",
+ *          format="date-time"
+ *      ),
+ *      @SWG\Property(
+ *          property="sale_id",
+ *          description="Sale id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="note",
+ *          description="Note",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="amount",
+ *          description="Amount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="discount",
+ *          description="Discount amount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="total",
+ *          description="Total amount",
+ *          type="number",
+ *          format="double"
+ *      ),
+ *      @SWG\Property(
+ *          property="coupon_code",
+ *          description="Coupon code",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="payment_type_id",
+ *          description="Payment type id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="payment_state_id",
+ *          description="Payment state id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="user_id",
+ *          description="User id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="pay_method",
+ *          description="Pay method",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="pay_ref",
+ *          description="Payment reference",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="store_id",
+ *          description="Store id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="bank_account_id",
+ *          description="Bank account id",
+ *          type="integer",
+ *          format="int32"
+ *      )
+ * )
  */
 class Payment extends Model
 {
@@ -92,5 +181,4 @@ class Payment extends Model
     {
         return $this->belongsTo('App\Models\BankAccount');
     }
-
 }

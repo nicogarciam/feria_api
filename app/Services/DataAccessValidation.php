@@ -14,6 +14,10 @@ class DataAccessValidation
             return true;
         }
 
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
+            return true;
+        }
+
         $stores = $this->getCheckStores();
 
         $tmp = [];
@@ -28,6 +32,10 @@ class DataAccessValidation
     public function validateProducts($productIds)
     {
         if (empty($productIds) || sizeof($productIds) < 1 ) {
+            return [];
+        }
+
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
             return [];
         }
 
@@ -63,6 +71,10 @@ class DataAccessValidation
             return true;
         }
 
+        if (\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, ['SUPER_ADMIN'])) {
+            return true;
+        }
+
         $stores = $this->getCheckStores();
 
 
@@ -82,12 +94,16 @@ class DataAccessValidation
 
     public function getCheckStores() {
 
-        if (session()->exists('stores')) {
+        $stores = [];
+        $stores = session()->exists('stores') ? session()->get('stores') : null;
+
+        if ($stores && sizeof($stores) > 0) {
             $stores = session()->get('stores');
         } else {
             $stores = Auth::user()->myStores();
             session()->put('stores', $stores);
         }
+
 
         return $stores->toArray();
     }
