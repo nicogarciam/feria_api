@@ -5,6 +5,34 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+
+/**
+* @SWG\Definition(
+ *   definition="Settlement",
+ *   required={"provider_id", "start_date", "end_date", "total_sales", "amount_to_pay", "status"},
+ *   @SWG\Property(property="id", type="integer", format="int64", example=10),
+ *   @SWG\Property(property="store_id", type="integer", format="int32", example=1),
+ *   @SWG\Property(property="provider_id", type="integer", format="int64", example=5),
+ *   @SWG\Property(property="start_date", type="string", format="date", example="2026-04-01"),
+ *   @SWG\Property(property="end_date", type="string", format="date", example="2026-04-30"),
+ *   @SWG\Property(property="total_sales", type="number", format="double", example=100000.50),
+ *   @SWG\Property(property="amount_to_pay", type="number", format="double", example=35000.25),
+ *   @SWG\Property(property="status", type="string", enum={"pending", "paid", "cancelled"}, example="pending"),
+ *   @SWG\Property(property="generated_at", type="string", format="date-time"),
+ *   @SWG\Property(property="generated_by", type="integer", format="int64", example=1),
+ *   @SWG\Property(property="paid_at", type="string", format="date-time"),
+ *   @SWG\Property(property="paid_by", type="integer", format="int64"),
+ *   @SWG\Property(property="cancelled_at", type="string", format="date-time"),
+ *   @SWG\Property(property="cancelled_by", type="integer", format="int64"),
+ *   @SWG\Property(property="user", type="string", example="admin@feria.com"),
+ *   @SWG\Property(
+ *     property="settle_details",
+ *     type="array",
+ *     @SWG\Items(ref="#/definitions/SettlementDetail")
+*   )
+ * )
+ *
+ */
 class Settlement extends Model
 {
     use HasFactory;

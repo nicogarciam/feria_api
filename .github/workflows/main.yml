@@ -47,6 +47,10 @@ jobs:
             /.docker/
             /.idea/
 
+        with:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       # 6. Comandos post-despliegue (instalar dependencias, migraciones, etc.)
       - name: Post-deploy Laravel commands
         uses: appleboy/ssh-action@v1.0.3

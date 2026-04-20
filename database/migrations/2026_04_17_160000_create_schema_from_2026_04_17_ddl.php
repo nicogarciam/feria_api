@@ -432,7 +432,6 @@ return new class extends Migration
         Schema::dropIfExists('providers');
         Schema::dropIfExists('products');
         Schema::dropIfExists('product_states');
-        Schema::dropIfExists('personal_access_tokens');
         Schema::dropIfExists('payments');
         Schema::dropIfExists('payment_states');
         Schema::dropIfExists('payment_items');

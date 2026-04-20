@@ -30,6 +30,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Get list of settlements with pagination and filtering",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="page",
      *          in="query",
@@ -38,7 +39,7 @@ class SettlementAPIController extends AppBaseController
      *          default=1
      *      ),
      *      @SWG\Parameter(
-     *          name="limit",
+     *          name="size",
      *          in="query",
      *          type="integer",
      *          description="Records per page",
@@ -58,32 +59,30 @@ class SettlementAPIController extends AppBaseController
      *          description="Filter by status"
      *      ),
      *      @SWG\Parameter(
-     *          name="start_date",
+     *          name="date_from",
      *          in="query",
      *          type="string",
      *          format="date",
-     *          description="Start date for filtering"
+     *          description="Filter from date (Y-m-d)"
      *      ),
      *      @SWG\Parameter(
-     *          name="end_date",
+     *          name="date_to",
      *          in="query",
      *          type="string",
      *          format="date",
-     *          description="End date for filtering"
+     *          description="Filter to date (Y-m-d)"
      *      ),
      *      @SWG\Parameter(
-     *          name="sort_by",
+     *          name="store_id",
      *          in="query",
-     *          type="string",
-     *          enum={"generated_at", "total_sales", "amount_to_pay"},
-     *          description="Sort by field"
+     *          type="integer",
+     *          description="Filter by store ID"
      *      ),
      *      @SWG\Parameter(
-     *          name="sort_order",
+     *          name="sort",
      *          in="query",
      *          type="string",
-     *          enum={"asc", "desc"},
-     *          default="desc"
+     *          description="Sort format: field,direction. Example: generated_at,desc"
      *      ),
      *      @SWG\Response(
      *          response=200,
@@ -99,7 +98,7 @@ class SettlementAPIController extends AppBaseController
      *                  property="meta",
      *                  type="object",
      *                  @SWG\Property(property="total", type="integer"),
-     *                  @SWG\Property(property="page", type="integer"),
+     *                  @SWG\Property(property="current_page", type="integer"),
      *                  @SWG\Property(property="last_page", type="integer")
      *              )
      *          )
@@ -141,6 +140,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Get settlement preview without saving",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="provider_id",
      *          in="query",
@@ -166,7 +166,13 @@ class SettlementAPIController extends AppBaseController
      *      ),
      *      @SWG\Response(
      *          response=200,
-     *          description="successful operation"
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="message", type="string"),
+     *              @SWG\Property(property="data", ref="#/definitions/SettlementPreview")
+     *          )
      *      ),
      *      @SWG\Response(
      *          response=400,
@@ -197,20 +203,18 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Create a new settlement",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="body",
      *          in="body",
      *          description="Settlement data",
      *          required=true,
-     *          @SWG\Schema(
-     *              @SWG\Property(property="provider_id", type="integer", example=1),
-     *              @SWG\Property(property="start_date", type="string", format="date", example="2026-04-01"),
-     *              @SWG\Property(property="end_date", type="string", format="date", example="2026-04-30")
-     *          )
+     *          @SWG\Schema(ref="#/definitions/SettlementStoreRequest")
      *      ),
      *      @SWG\Response(
-     *          response=201,
-     *          description="Settlement created successfully"
+     *          response=200,
+     *          description="Settlement created successfully",
+     *          @SWG\Schema(ref="#/definitions/Settlement")
      *      ),
      *      @SWG\Response(
      *          response=400,
@@ -295,6 +299,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Get detailed information about a specific settlement",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="id",
      *          description="Settlement ID",
@@ -304,7 +309,8 @@ class SettlementAPIController extends AppBaseController
      *      ),
      *      @SWG\Response(
      *          response=200,
-     *          description="successful operation"
+     *          description="successful operation",
+     *          @SWG\Schema(ref="#/definitions/Settlement")
      *      ),
      *      @SWG\Response(
      *          response=404,
@@ -331,6 +337,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Cancel a settlement (only if status is pending)",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="id",
      *          description="Settlement ID",
@@ -340,7 +347,13 @@ class SettlementAPIController extends AppBaseController
      *      ),
      *      @SWG\Response(
      *          response=200,
-     *          description="Settlement cancelled successfully"
+     *          description="Settlement cancelled successfully",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="message", type="string"),
+     *              @SWG\Property(property="data", ref="#/definitions/Settlement")
+     *          )
      *      ),
      *      @SWG\Response(
      *          response=400,
@@ -377,6 +390,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Get list of providers with unsettled sales for a period",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="start_date",
      *          in="query",
@@ -393,7 +407,11 @@ class SettlementAPIController extends AppBaseController
      *      ),
      *      @SWG\Response(
      *          response=200,
-     *          description="successful operation"
+     *          description="successful operation",
+     *          @SWG\Schema(
+     *              type="array",
+     *              @SWG\Items(ref="#/definitions/PendingSettlementProvider")
+     *          )
      *      )
      * )
      */
@@ -419,6 +437,7 @@ class SettlementAPIController extends AppBaseController
      *      tags={"Settlements"},
      *      description="Mark a settlement as paid",
      *      produces={"application/json"},
+     *      security={{"Bearer":{}}},
      *      @SWG\Parameter(
      *          name="id",
      *          description="Settlement ID",
@@ -428,7 +447,13 @@ class SettlementAPIController extends AppBaseController
      *      ),
      *      @SWG\Response(
      *          response=200,
-     *          description="Settlement marked as paid"
+     *          description="Settlement marked as paid",
+     *          @SWG\Schema(
+     *              type="object",
+     *              @SWG\Property(property="success", type="boolean"),
+     *              @SWG\Property(property="message", type="string"),
+     *              @SWG\Property(property="data", ref="#/definitions/Settlement")
+     *          )
      *      ),
      *      @SWG\Response(
      *          response=400,
@@ -442,7 +467,7 @@ class SettlementAPIController extends AppBaseController
             $settlement = $this->settlementRepository->markSettlementAsPaid($id, auth()->id());
 
             return $this->sendResponse(
-                new $settlement,
+                $settlement,
                 'Settlement marked as paid successfully'
             );
 
