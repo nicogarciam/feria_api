@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy Laravel backend to /home/feriar/www/app/
+      - name: Deploy Laravel backend to /home/feriar/www/
         uses: easingthemes/ssh-deploy@main
         with:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -21,7 +21,7 @@ jobs:
           remote_port: 22
           args: "-rlgoDzvc -i --delete"
           source: "./"
-          target: "/home/feriar/www/app/"
+          target: "/home/feriar/www/"
           exclude: "/node_modules/, /vendor/, /.env, /.env.*, /storage/, /tests/, /.git/, /.github/, /.gitignore, /phpunit.xml, /README.md, /composer.lock, /package.json, /package-lock.json, /webpack.mix.js, /vite.config.js, /.editorconfig, /.phpunit.cache/, /docker-compose.yml, /Dockerfile, /.docker/, /.idea/"
 
       - name: Post-deploy Laravel commands
@@ -32,7 +32,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/feriar/www/app
+            cd /home/feriar/www
             composer install --no-dev --optimize-autoloader
             php artisan config:cache
             php artisan route:cache
