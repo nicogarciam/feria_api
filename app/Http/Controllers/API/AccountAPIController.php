@@ -160,6 +160,7 @@ class AccountAPIController extends AppBaseController
 
     public function register(CreateAccountAPIRequest $request)
     {
+
         $input = $request->all();
 
         $turnstileResponse = $request->input('cf-turnstile-response');
@@ -180,15 +181,24 @@ class AccountAPIController extends AppBaseController
 
         $input['activated'] = false;
 
-        $userData = $input;
-        $fullName = trim($userData['name'] ?? '');
-        $nameParts = preg_split('/\s+/', $fullName, 2);
-        $firstName = $nameParts[0] ?? '';
-        $lastName = $nameParts[1] ?? '';
+        /**
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        storeName: '',
+        storeType: '',
+        storeCount: '',
+        phone: '',
+         * */
 
+        $userData = $input;
+        $firstName = $userData['firstName'] ? trim($userData[ 'firstName']) : '';
+        $lastName = $userData['lastName'] ? trim($userData[ 'lastName']) : '';
+        $fullName = $firstName . ' ' . $lastName;
         // create user
         $user = User::create([
-            'name' => $userData['name'],
+            'name' => $fullName,
             'email' => $userData['email'],
             'password' => Hash::make($userData['password']),
             'logins' => 0,
@@ -198,7 +208,6 @@ class AccountAPIController extends AppBaseController
         $input['first_name'] = $firstName;
         $input['last_name'] = $lastName;
         $input['email'] = $userData['email'];
-
 
         $account = $this->accountRepository->create($input);
 

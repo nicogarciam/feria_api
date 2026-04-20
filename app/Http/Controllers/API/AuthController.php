@@ -215,12 +215,12 @@ class AuthController extends Controller
                 $token = auth()->login($user);
             }
         } catch (Exception $e) {
-            dd($e->getMessage());
+            logger($e);
         }
         $user = auth()->user();
 
-        $hotels = $user->myStores();
-        session()->put('hotels', $hotels);
+        $stores = $user->myStores();
+        session()->put('stores', $stores);
 
         $user->logins += 1;
         $user->google_id = $payload->sub;
