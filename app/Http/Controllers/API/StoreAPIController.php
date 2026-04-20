@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreatestoreAPIRequest;
-use App\Http\Requests\API\UpdatestoreAPIRequest;
+use App\Http\Requests\API\CreateStoreAPIRequest;
+use App\Http\Requests\API\UpdateStoreAPIRequest;
 use App\Models\Store;
 use App\Repositories\ProductRepository;
 use App\Repositories\StoreRepository;
