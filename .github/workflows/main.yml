@@ -20,32 +20,10 @@ jobs:
           remote_user: ${{ secrets.REMOTE_USER }}
           remote_port: 22
           args: "-rlgoDzvc -i --delete"
-          source: "./"      # Si tu Laravel está en la raíz del repositorio. Si está en subcarpeta, cámbialo (ej: "laravel/")
+          source: "./"
           target: "/home/feriar/www/app/"
-          exclude: |
-            /node_modules/
-            /vendor/
-            /.env
-            /.env.*
-            /storage/
-            /tests/
-            /.git/
-            /.github/
-            /.gitignore
-            /phpunit.xml
-            /README.md
-            /composer.lock
-            /package.json
-            /package-lock.json
-            /webpack.mix.js
-            /vite.config.js
-            /.editorconfig
-            /.phpunit.cache/
-            /docker-compose.yml
-            /Dockerfile
-            /.docker/
-            /.idea/
-            
+          exclude: "/node_modules/, /vendor/, /.env, /.env.*, /storage/, /tests/, /.git/, /.github/, /.gitignore, /phpunit.xml, /README.md, /composer.lock, /package.json, /package-lock.json, /webpack.mix.js, /vite.config.js, /.editorconfig, /.phpunit.cache/, /docker-compose.yml, /Dockerfile, /.docker/, /.idea/"
+
       - name: Post-deploy Laravel commands
         uses: appleboy/ssh-action@v1.0.3
         with:
