@@ -20,19 +20,13 @@
         "fruitcake/laravel-cors": "^2.0",
         "google/apiclient": "^2.13",
         "guzzlehttp/guzzle": "^7.5",
-        "infyomlabs/adminlte-templates": "8.0.x-dev",
-        "infyomlabs/laravel-generator": "8.0.x-dev",
-        "infyomlabs/swagger-generator": "v3.2.0",
         "laravel/framework": "^8.0",
         "laravel/sanctum": "^2.7",
         "laravel/socialite": "^6.x-dev",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.4",
         "laravelcollective/html": "^6.2",
-        "php-open-source-saver/jwt-auth": "^1.4",
-        "yajra/laravel-datatables": "^1.5",
-        "yajra/laravel-datatables-html": "^4.32",
-        "yajra/laravel-datatables-oracle": "~9.0"
+        "php-open-source-saver/jwt-auth": "^1.4"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",
