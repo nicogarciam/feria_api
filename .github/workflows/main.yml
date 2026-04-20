@@ -1,4 +1,4 @@
-name: Deploy to Alwaysdata
+name: Deploy Laravel Backend to Alwaysdata
 
 on:
   push:
@@ -9,22 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Clonar el repositorio
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Desplegar backend Laravel en /home/feriar/www/app/
-      #    Se excluyen archivos y carpetas que no deben subirse
-      - name: Deploy backend (Laravel) to app folder
+      - name: Deploy Laravel backend to /home/feriar/www/app/
         uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-rlgoDzvc -i --delete"        # --delete elimina archivos obsoletos en el servidor
-          SOURCE: "./"                   # Cambia al directorio donde está tu Laravel (ej: "backend/", "./")
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: "/home/feriar/www/app/"
-          EXCLUDE: |
+        with:
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_port: 22
+          args: "-rlgoDzvc -i --delete"
+          source: "./"      # Si tu Laravel está en la raíz del repositorio. Si está en subcarpeta, cámbialo (ej: "laravel/")
+          target: "/home/feriar/www/app/"
+          exclude: |
+            /node_modules/
             /vendor/
             /.env
             /.env.*
@@ -47,11 +46,9 @@ jobs:
             /.docker/
             /.idea/
 
-        with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      # 6. Comandos post-despliegue (instalar dependencias, migraciones, etc.)
       - name: Post-deploy Laravel commands
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -61,9 +58,7 @@ jobs:
           port: 22
           script: |
             cd /home/feriar/www/app
-            # Instalar dependencias de Composer (sin desarrollo)
             composer install --no-dev --optimize-autoloader
-            # Limpiar y cachear configuraciones
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
