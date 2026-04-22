@@ -22,7 +22,9 @@ class ProductRepository extends BaseRepository
         'store_id',
         'category_id',
         'state_id',
-        'provider_id'
+        'provider_id',
+        'entry_date',
+        'gender'
     ];
 
     protected $fieldLikeable = [
@@ -138,9 +140,9 @@ class ProductRepository extends BaseRepository
             foreach($search as $key => $value) {
                 if (in_array($key, $this->getFieldsSearchable())) {
                     if ($key == 'date_from') {
-                        $query->where('created_at', '>=', $value);
+                        $query->where('entry_date', '>=', $value);
                     } elseif ($key == 'date_to') {
-                        $query->where('created_at', '<=', $value);
+                        $query->where('entry_date', '<=', $value);
                     } else{
                         $query->where($key, $value);
                     }

@@ -7,6 +7,7 @@ use App\Models\Benefit;
 use App\Models\Entity;
 use App\Models\Image;
 use App\Models\Product;
+use App\Models\Store;
 use App\Services\AIService;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
@@ -336,7 +337,7 @@ class ImageAPIController extends AppBaseController
      *      )
      * )
      */
-    public function uploadImage(Request $request, $type = 'products')
+    public function uploadImage(Request $request)
     {
 
         $input = $request->all();
@@ -344,8 +345,11 @@ class ImageAPIController extends AppBaseController
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $filename = $image->getClientOriginalName();
+            $type = $input['type'] ?? 'product';
+            $storeId = $input['store_id'] ?? null;
+            $store = $storeId ? Store::find($storeId) : null;
 
-            $path = $this->imageService->upload($request->file('image'), $type);
+            $path = $this->imageService->upload($request->file('image'), $type, $store);
 
             $newImage = [
                 'primary' => $input['primary'] ?? null,

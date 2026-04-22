@@ -37,7 +37,10 @@ class Product extends Model
         'size',
         'price',
         'cost',
-        'fee'
+        'fee',
+        'entry_date',
+        'sale_date',
+        'gender'
     ];
 
     /**

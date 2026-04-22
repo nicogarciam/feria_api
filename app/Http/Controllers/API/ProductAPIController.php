@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateProductAPIRequest;
 use App\Http\Requests\API\UpdateProductAPIRequest;
 use App\Models\Image;
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\Provider;
+use App\Models\ProductState;
 use App\Models\Sale;
 use App\Repositories\ProductRepository;
 use App\Services\PaginationService;
@@ -122,7 +125,7 @@ class ProductAPIController extends AppBaseController
     public function query(Request $request)
      {
 
-         $search = $request->only(['provider_id', 'status', 'date_from', 'date_to','store_id']);
+         $search = $request->only(['provider_id', 'status', 'date_from', 'date_to','store_id','gender']);
          $q = $request->get('q');
          $page = $request->get('page', 1);
          $size = $request->get('size', 10);
@@ -190,6 +193,118 @@ class ProductAPIController extends AppBaseController
         $product = $this->productRepository->create($input);
 
         return $this->sendResponse(new ProductResource($product), 'Product created successfully');
+    }
+
+    /**
+     * Store multiple products at once with extended logic.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function bulk(Request $request)
+    {
+        $productsData = $request->get('products');
+        $storeId = $request->get('store_id');
+        $createMissingProviders = $request->get('create_missing_providers', false);
+
+        if (!is_array($productsData)) {
+            return $this->sendError('Invalid data format. Expected an array of products.');
+        }
+
+        $results = [
+            'total' => count($productsData),
+            'success' => 0,
+            'errors' => []
+        ];
+
+        // Pre-fetch states and categories for efficiency
+        $states = ProductState::all()->pluck('id', 'name')->mapWithKeys(function ($id, $name) {
+            return [strtolower($name) => $id];
+        });
+
+        $categories = Category::all()->pluck('id', 'name')->mapWithKeys(function ($id, $name) {
+            return [strtolower($name) => $id];
+        });
+
+        DB::beginTransaction();
+        try {
+            // Handle missing providers if requested
+            if ($createMissingProviders) {
+                $uniqueProviderNames = collect($productsData)
+                    ->pluck('provider_name')
+                    ->filter()
+                    ->unique();
+
+                foreach ($uniqueProviderNames as $name) {
+                    $exists = Provider::where('name', $name)->exists();
+                    if (!$exists) {
+                        Provider::create([
+                            'name' => $name,
+                            'email' => strtolower(str_replace(' ', '.', $name)) . '@feria.com',
+                            // Other required fields should have defaults or be nullable
+                        ]);
+                    }
+                }
+            }
+
+            // Map providers again to get all IDs (including newly created ones)
+            $providers = Provider::all()->pluck('id', 'name');
+
+            foreach ($productsData as $index => $data) {
+                try {
+                    // 1. Map Provider
+                    if (!empty($data['provider_name'])) {
+                        $data['provider_id'] = $providers[$data['provider_name']] ?? null;
+                    }
+
+                    // 2. Map Category (Default to 1 if not found)
+                    $catName = strtolower($data['category_name'] ?? '');
+                    $data['category_id'] = $categories[$catName] ?? 1;
+
+                    // 3. Map State (Associate states with product_states ID)
+                    $stateName = strtolower($data['state'] ?? '');
+                    $data['state_id'] = $states[$stateName] ?? null;
+
+                    // 4. Map Gender (M -> Mujer, H -> Hombre)
+                    if (isset($data['gender'])) {
+                        if ($data['gender'] === 'M') {
+                            $data['gender'] = 'Mujer';
+                        } elseif ($data['gender'] === 'H') {
+                            $data['gender'] = 'Hombre';
+                        }
+                    }
+
+                    // 5. General fields
+                    $data['store_id'] = $storeId;
+                    $data['code'] = !empty($data['code']) ? $data['code'] : strtoupper(substr(uniqid(), 0, 10));
+
+                    // Parse date if present
+                    if (!empty($data['entry_date'])) {
+                        try {
+                            $data['entry_date'] = Carbon::parse($data['entry_date'])->toDateTimeString();
+                        } catch (\Exception $e) {
+                            // Keep original if parsing fails, or handle error
+                        }
+                    }
+
+                    // Use repository to create
+                    $this->productRepository->create($data);
+                    $results['success']++;
+                } catch (\Exception $e) {
+                    $results['errors'][] = [
+                        'index' => $index,
+                        'title' => $data['title'] ?? 'Unknown',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error processing bulk import: ' . $e->getMessage());
+        }
+
+        return $this->sendResponse($results, 'Bulk import processed.');
     }
 
     /**

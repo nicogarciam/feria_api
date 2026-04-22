@@ -85,7 +85,7 @@ Route::group([
 
     Route::get('stores/{storeId}/sale_states', [SaleStateAPIController::class,'findByStore'] );
 
-    Route::post('products/bulk', [ProductAPIController::class, 'bulkStore']);
+    Route::post('products/bulk', [ProductAPIController::class, 'bulk']);
     Route::get('products/query',[ProductAPIController::class,'query'] );
 
     Route::post('images/upload',[ImageAPIController::class, 'uploadImage']);

@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateStoreAPIRequest;
 use App\Models\Store;
 use App\Repositories\ProductRepository;
 use App\Repositories\StoreRepository;
+use App\Services\ImageService;
 use Facades\App\Services\DataAccessValidation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -23,12 +24,15 @@ class StoreAPIController extends AppBaseController
     /** @var  StoreRepository */
     private $storeRepository;
     private $productRepository;
+    private $imageService;
 
     public function __construct(StoreRepository   $storeRepo,
-                                ProductRepository $productRepository)
+                                ProductRepository $productRepository,
+                                ImageService $imageService)
     {
         $this->storeRepository = $storeRepo;
         $this->productRepository = $productRepository;
+        $this->imageService = $imageService;
     }
 
     /**
@@ -82,8 +86,15 @@ class StoreAPIController extends AppBaseController
     {
         $input = $request->all();
         $input['city_id'] = $input['city_id'] ?? 1;
+        $logoPath = $input['logo'] ?? null;
 
         $store = $this->storeRepository->create($input);
+        if (!empty($logoPath)) {
+            $movedLogoPath = $this->imageService->moveFromGenericToStore($logoPath, $store, 'stores');
+            if ($movedLogoPath !== null) {
+                $store = $this->storeRepository->update(['logo' => $movedLogoPath], $store->id);
+            }
+        }
 
         $stores = auth()->user()->myStores();
         session()->put('stores', $stores);
