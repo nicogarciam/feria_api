@@ -33,11 +33,15 @@ class Movement extends Model
         'provider_id',
         'store_id',
         'pay_id',
+        'withdrawal_id',
+        'settlement_id',
         'concept',
         'amount',
         'type',
         'state',
-        'user'
+        'user',
+        'user_id',
+        'cash_account_id'
     ];
 
     /**
@@ -52,7 +56,11 @@ class Movement extends Model
         'amount' => 'float',
         'type' => 'string',
         'state' => 'string',
-        'user' => 'string'
+        'user' => 'string',
+        'withdrawal_id' => 'integer',
+        'settlement_id' => 'integer',
+        'description' => 'string',
+        'cash_account_id' => 'integer'
     ];
 
     /**
@@ -72,9 +80,52 @@ class Movement extends Model
         return $this->balance;
     }
 
-    public function calculateBalance($balance_acum){
-
+    public function calculateBalance($balance_acum) {
         return $this->balance = $balance_acum + ( $this->types[$this->type] * $this->amount);
+    }
+
+    public function getMovement(){
+
+        return ( $this->types[$this->type] * $this->amount);
+    }
+
+
+    public function matchesCriteria($criteria)
+    {
+        //"store_id": 3,
+        // "cash_account_id": 1
+
+        foreach ($criteria as $key => $value) {
+            if ($this->getAttribute($key) != $value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    public function cashAccount()
+    {
+        return $this->belongsTo(CashAccount::class);
     }
 
 

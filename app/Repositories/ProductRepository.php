@@ -162,7 +162,7 @@ class ProductRepository extends BaseRepository
             $query->orderBy('generated_at');
         }
 
-        return $query->with(['provider']);
+        return $query->with(['provider', 'state', 'primaryImage']);
     }
 
 

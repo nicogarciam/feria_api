@@ -107,6 +107,8 @@ class SettlementAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
+
+        $storeId = $request->get('store_id');
         $search = $request->only(['provider_id', 'status', 'date_from', 'date_to','store_id']);
         $limit = $request->get('limit', 10);
         $page = $request->get('page', 1);
@@ -123,6 +125,12 @@ class SettlementAPIController extends AppBaseController
                     $orders[] = $sortParts[$i] . ',' . $sortParts[$i + 1];
                 }
             }
+        }
+
+        $valid = DataAccessValidation::validateStore($storeId);
+
+        if (!$valid) {
+            return $this->sendError('unauthorized.store','403');
         }
 
         $query = $this->settlementRepository->allSettlementsQuery(
@@ -233,10 +241,11 @@ class SettlementAPIController extends AppBaseController
         }
 
         $userId = Auth::id();
+        $user = Auth::user();
 
         try {
 
-            $settlement = DB::transaction(function () use ($input, $userId) {
+            $settlement = DB::transaction(function () use ($input, $userId, $user) {
 
 
                 $details = $input['settle_details'];
@@ -244,6 +253,8 @@ class SettlementAPIController extends AppBaseController
                 $data = [
                     ...$input,
                     'generated_by' => $userId,
+                    'generated_at' => now(),
+                    'user' => $user->email,
                 ];
 
                 if ($input['status'] === 'paid') {
@@ -257,12 +268,15 @@ class SettlementAPIController extends AppBaseController
                 }
 
                 $settlement = $this->settlementRepository->create($data);
+                if ($settlement->status === 'paid') {
+                    $this->markAsPaid($settlement->id);
+                }
 
                 // 🔒 Procesar detalles con lock
                 foreach ($details as $sd) {
                     $saleItem = SaleItem::lockForUpdate()->findOrFail($sd['sale_item_id']);
 
-                    $settlement->seattle_details()->create([
+                    $settlement->settle_details()->create([
                         ...$sd,
                         'settlement_id' => $settlement->id
                     ]);
@@ -322,7 +336,7 @@ class SettlementAPIController extends AppBaseController
     {
         try {
             $settlement = Settlement::with(['store','provider','settle_details',
-                'settle_details.sale_item.product'])->findOrFail($id);
+                'settle_details.sale_item.product', 'cashAccount', 'originUser'])->findOrFail($id);
 
             return response()->json($settlement);
         } catch (Exception $e) {
@@ -464,7 +478,9 @@ class SettlementAPIController extends AppBaseController
     public function markAsPaid($id)
     {
         try {
-            $settlement = $this->settlementRepository->markSettlementAsPaid($id, auth()->id());
+            $user = Auth::user();
+            // Liquidacion a Proveedor
+            $settlement = $this->settlementRepository->markSettlementAsPaid($id, $user);
 
             return $this->sendResponse(
                 $settlement,

@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://feriar-512470151974.us-central1.run.app'],
+    'allowed_origins' => ['https://feriar-512470151974.us-central1.run.app', 'http://localhost:4200'],
 
     'allowed_origins_patterns' => [],
 

@@ -1,8 +1,10 @@
 <?php
 namespace App\Services;
 
+use App\Models\CashAccount;
 use App\Models\Movement;
 use App\Models\Provider;
+use App\Models\Store;
 use App\Repositories\MovementRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -13,46 +15,140 @@ class MovementsService
 
     protected $movementRepository;
 
-    public function __constructor(MovementRepository $repo)
+    public function __construct(MovementRepository $repo)
     {
         $this->movementRepository = $repo;
     }
+
+    static function getDefaultCashAccount($storeId)
+    {
+        $store = Store::find($storeId);
+        if (!$store) return null;
+
+        $account = $store->defaultCashAccount;
+        if (!$account) {
+            $account = CashAccount::create([
+                'name' => 'Caja Principal',
+                'store_id' => $storeId,
+                'is_default' => true,
+                'balance' => 0
+            ]);
+        }
+        return $account;
+    }
+
+    static function generateWithdrawalMovement($withdrawal)
+    {
+        $cashAccount = self::getDefaultCashAccount($withdrawal->store_id);
+
+        $movementStore = Movement::updateOrCreate(
+            ['withdrawal_id' => $withdrawal->id, 'store_id' => $withdrawal->store_id],
+            [
+                'store_id' => $withdrawal->store_id,
+                'cash_account_id' => $cashAccount?->id,
+                'date' => $withdrawal->date,
+                'concept' => $withdrawal->concept,
+                'description' => $withdrawal->description,
+                'amount' => $withdrawal->amount,
+                'type' => 'DEBIT',
+                'user' => $withdrawal->user,
+                'state' => 'CREATED',
+            ]
+        );
+
+        $movementUser = Movement::updateOrCreate(
+            ['withdrawal_id' => $withdrawal->id, 'user_id' => $withdrawal->user_payee_id],
+            [
+                'user_id' => $withdrawal->user_payee_id,
+                'store_id' => $withdrawal->store_id,
+                'date' => $withdrawal->date,
+                'concept' => $withdrawal->concept,
+                'description' => $withdrawal->description,
+                'amount' => $withdrawal->amount,
+                'type' => 'CREDIT',
+                'user' => $withdrawal->user,
+                'state' => 'CREATED',
+            ]
+        );
+
+        $movements = [$movementStore, $movementUser];
+        return $movements;
+    }
+
+    static function generateSettlementMovement($settlement, $user)
+    {
+        $cashAccountId = $settlement->cash_account_id;
+        $userId = $settlement->origin_user_id;
+
+        // Si no hay origen definido, usamos la caja por defecto de la tienda
+        if (!$cashAccountId && !$userId) {
+            $cashAccount = self::getDefaultCashAccount($settlement->store_id);
+            $cashAccountId = $cashAccount?->id;
+        }
+
+        $movement = Movement::updateOrCreate(
+            ['settlement_id' => $settlement->id],
+            [
+                'store_id' => $settlement->store_id,
+                'cash_account_id' => $cashAccountId,
+                'user_id' => $userId,
+                'date' => $settlement->paid_at ?? $settlement->generated_at,
+                'concept' => 'Liquidación a ' . ($settlement->provider?->name ?? 'Proveedor'),
+                'amount' => $settlement->amount_to_pay,
+                'type' => 'DEBIT',
+                'user' => $user->email,
+                'state' => 'CREATED',
+            ]
+        );
+        return $movement;
+    }
+
     static function generateSaleDebit($sale)
     {
-        $movement = new Movement();
-        $movement->sale_id = $sale->id;
-        $movement->store_id = $sale->store_id;
-        $movement->customer_id = $sale->customer_id;
-        $movement->date = $sale->date_sale;
-        $movement->concept = 'sale-' . $sale->code;
-        $movement->amount = $sale->total_price;
-        $movement->type = 'DEBIT';
-        $movement->user = $sale->user;
-        $movement->state = 'CREATED';
-        $movement->save();
+        $cashAccount = self::getDefaultCashAccount($sale->store_id);
+
+        $movement = Movement::updateOrCreate(
+            ['sale_id' => $sale->id, 'type' => 'DEBIT'],
+            [
+                'store_id' => $sale->store_id,
+                'cash_account_id' => $cashAccount?->id,
+                'customer_id' => $sale->customer_id,
+                'date' => $sale->date_sale,
+                'concept' => 'sale-' . $sale->code,
+                'amount' => $sale->total_price,
+                'type' => 'DEBIT',
+                'user' => $sale->user,
+                'state' => 'CREATED',
+            ]
+        );
     }
 
 
     static function generatePayCredit($pay)
     {
-        $movement = new Movement();
-        $movement->pay_id = $pay->id;
-        $movement->store_id = $pay->store_id;
-        $movement->customer_id = $pay->customer_id;
-        $movement->account_id = $pay->bank_account_id;
+        $cashAccount = self::getDefaultCashAccount($pay->store_id);
 
-        $movement->date = $pay->pay_date;
-        $movement->concept = $pay->concept;
-        $movement->amount = $pay->amount;
-        $movement->type = 'CREDIT';
-        $movement->user = $pay->user;
-        $movement->state = 'CREATED';
-        $movement->save();
+        $movement = Movement::create(
+           [
+                'store_id' => $pay->store_id,
+                'cash_account_id' => $cashAccount?->id,
+                'customer_id' => $pay->customer_id,
+                'account_id' => $pay->bank_account_id,
+                'date' => $pay->pay_date,
+                'concept' => $pay->concept,
+                'amount' => $pay->amount,
+                'type' => 'CREDIT',
+                'user' => $pay->user,
+                'state' => 'CREATED',
+                'pay_id' => $pay->id,
+            ]
+        );
     }
 
 
     static function generateProviderCredit($product, $sale )
     {
+
         $movement = new Movement();
         $movement->sale_id = $sale->id;
         $movement->store_id = $product['store_id'];
@@ -72,23 +168,15 @@ class MovementsService
 
     public function generateProviderDebit( )
     {
-//        $movement = new Movement();
-//        $movement->store_id = $product['store_id'];
-//        $movement->provider_id = $product['provider_id'];
-//        $movement->date = $sale->date_sale;
-//        $movement->concept = ' - product: ' . $product['code'] . ' - product: ' . $product['description'] .
-//            ' $ ' . $product['price'] ;
-//        $movement->amount = $product['price'] * (1 - $product['fee']);
-//        $movement->type = 'CREDIT';
-//        $movement->user = $sale->user;
-//        $movement->state = 'CREATED';
-//        $movement->save();
     }
 
     static function generateChargeDebit($charge)
     {
+        $cashAccount = self::getDefaultCashAccount($charge->store_id);
+
         $movement = new Movement();
         $movement->store_id = $charge->store_id;
+        $movement->cash_account_id = $cashAccount?->id;
 
         $movement->date = $charge->date;
         $movement->concept = $charge->description;
@@ -98,8 +186,4 @@ class MovementsService
         $movement->state = 'CREATED';
         $movement->save();
     }
-
-
-
-
 }

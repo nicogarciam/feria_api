@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateStoreAPIRequest;
 use App\Http\Requests\API\UpdateStoreAPIRequest;
+use App\Models\CashAccount;
 use App\Models\Store;
 use App\Repositories\ProductRepository;
 use App\Repositories\StoreRepository;
@@ -12,6 +13,7 @@ use Facades\App\Services\DataAccessValidation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Response;
 
 /**
@@ -87,6 +89,7 @@ class StoreAPIController extends AppBaseController
         $input = $request->all();
         $input['city_id'] = $input['city_id'] ?? 1;
         $logoPath = $input['logo'] ?? null;
+        $user = Auth::user();
 
         $store = $this->storeRepository->create($input);
         if (!empty($logoPath)) {
@@ -96,11 +99,24 @@ class StoreAPIController extends AppBaseController
             }
         }
 
+        $store->users()->attach($user->id, [
+            'role' => 'owner',
+            'active' => true,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        CashAccount::create([
+            'name' => 'Caja Principal',
+            'store_id' => $store->id,
+            'is_default' => true,
+            'balance' => 0
+        ]);
+
         $stores = auth()->user()->myStores();
         session()->put('stores', $stores);
 
         return response()->json($store);
-//        return $this->sendResponse(new StoreResource($store), 'Store saved successfully');
     }
 
     /**
@@ -263,13 +279,10 @@ class StoreAPIController extends AppBaseController
 
     public function selectStore($id)
     {
-        /** @var Store $store */
-//        $stores = session('stores');
-
         $valid = DataAccessValidation::validateStore($id);
 
         if (!$valid) {
-            return $this->sendError('unauthorized.store','403');
+            return $this->sendError('unauthorized.store', '403');
         }
 
         $store = $this->storeRepository->find($id);
@@ -278,9 +291,35 @@ class StoreAPIController extends AppBaseController
             return $this->sendError('Store not found');
         }
 
+        $user = Auth::user();
+        if ($user->role === 'SUPER_ADMIN') {
+            $role = 'SUPER_ADMIN';
+        } else {
+            $role = DB::table('user_store')
+                ->where('user_id', $user->id)
+                ->where('store_id', $id)
+                ->value('role') ?? $user->role;
+        }
+
         session(['store_id' => $id]);
-        return response()->json($store);
-//        return $this->sendResponse(new StoreResource($store), 'Store retrieved successfully');
+
+        return $this->sendResponse([
+            'store' => $store,
+            'role' => $role
+        ], 'Store retrieved successfully');
+    }
+
+    public function cashAccounts($id)
+    {
+        $valid = DataAccessValidation::validateStore($id);
+        if (!$valid) {
+            return $this->sendError('unauthorized.store', '403');
+        }
+        $store = $this->storeRepository->find($id);
+        if (empty($store)) {
+            return $this->sendError('Store not found');
+        }
+        return response()->json($store->cashAccounts);
     }
 
 

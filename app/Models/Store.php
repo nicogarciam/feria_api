@@ -157,4 +157,14 @@ class Store extends Model
                     ->withPivot('role', 'active')
                     ->withTimestamps();
     }
+
+    public function cashAccounts()
+    {
+        return $this->hasMany(CashAccount::class);
+    }
+
+    public function defaultCashAccount()
+    {
+        return $this->hasOne(CashAccount::class)->where('is_default', true);
+    }
 }

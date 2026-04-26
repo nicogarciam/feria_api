@@ -71,12 +71,13 @@ class MovementRepository extends BaseRepository
 
         $query->selectRaw("sum( CASE WHEN type = 'DEBIT' THEN -1 * amount WHEN type = 'CREDIT' THEN amount ELSE 0 END) as b");
         $result = $query->first();
-        return $result ? $result->b : 0;
+        return $result->b ?? 0;
     }
 
     public function allBetween($date_from , $date_to, $where )
     {
         $query = $this->model->newQuery();
+        $query->with(['customer', 'provider', 'user', 'store', 'cashAccount']);
 
 
         if ($where) {

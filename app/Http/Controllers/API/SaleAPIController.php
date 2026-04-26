@@ -113,6 +113,10 @@ class SaleAPIController extends AppBaseController
         }
         DB::beginTransaction();
             $deleted = SaleItem::where('sale_id', $saleId)->where('product_id', $productId)->delete();
+
+            // Reset product state to AVAILABLE
+            DB::table('products')->where('id', $productId)->update(['state_id' => ProductState::AVAILABLE]);
+
             $sale = $this->saleRepository->find($saleId, ['products']);
             $sale->total_price = $sale->products->sum('price');
 
@@ -160,8 +164,6 @@ class SaleAPIController extends AppBaseController
         $booking->code = $this->saleRepository->generateCode($booking);
         return response()->json($booking);
     }
-
-
 
     public function store(CreateSaleAPIRequest $request)
     {
@@ -245,22 +247,46 @@ class SaleAPIController extends AppBaseController
         }
 
         $new_sale_state_id = $input['sale_state_id'];
+        $products = $input['products'] ?? [];
 
         DB::beginTransaction();
 
         $sale = $this->saleRepository->update($input, $id);
-        $new_sale_state = SaleService::setSaleState($sale, $new_sale_state_id,'sale_update',null, false);
+        $new_sale_state = SaleService::setSaleState($sale, $new_sale_state_id, 'sale_update', null, false);
+
+        // Sync products
+        $old_products_ids = DB::table('sale_items')->where('sale_id', $id)->pluck('product_id')->toArray();
+        $new_products_ids = collect($products)->pluck('id')->toArray();
+
+        // Products to remove
+        $to_remove = array_diff($old_products_ids, $new_products_ids);
+        if (!empty($to_remove)) {
+            DB::table('products')->whereIn('id', $to_remove)->update(['state_id' => ProductState::AVAILABLE]);
+            DB::table('sale_items')->where('sale_id', $id)->whereIn('product_id', $to_remove)->delete();
+        }
+
+        // Products to add/update
+        foreach ($products as $p) {
+            DB::table('sale_items')->updateOrInsert(
+                ['sale_id' => $id, 'product_id' => $p['id']],
+                ['price' => $p['price'], 'status' => $p['status']]
+            );
+            DB::table('products')->where('id', $p['id'])->update([
+                'state_id' => $p['state_id'],
+                'price' => $p['price']
+            ]);
+        }
 
         // Si la venta se cambia a pagada, generar movimientos de credito a los proveedores
         if ($new_sale_state_id == 3) {
-            $products = $sale->products();
-            foreach ($products as $product) {
-                MovementsService::generateProviderCredit($product,$sale);
+            $products_models = $sale->products; // Use the relationship
+            foreach ($products_models as $product) {
+                MovementsService::generateProviderCredit($product, $sale);
             }
         }
         $sale->save();
         DB::commit();
-        $sale = $this->saleRepository->find($id);
+        $sale = $this->saleRepository->find($id, ['products']);
         return response()->json($sale);
 
     }

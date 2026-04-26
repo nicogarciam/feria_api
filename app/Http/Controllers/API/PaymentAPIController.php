@@ -55,7 +55,6 @@ class PaymentAPIController extends AppBaseController
     public function findForSale($saleId = null)
     {
 
-
         $payments = $this->paymentRepository->forSaleFull($saleId);
 
         return response()->json($payments);

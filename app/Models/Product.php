@@ -86,6 +86,11 @@ class Product extends Model
         return $this->hasMany(Image::class);
     }
 
+    public function primaryImage()
+    {
+        return $this->hasOne(Image::class)->where('primary', 1);
+    }
+
     public function provider()
     {
         return $this->belongsTo('App\Models\Provider');

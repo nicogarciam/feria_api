@@ -172,9 +172,9 @@ class Payment extends Model
     {
         return $this->belongsTo('App\Models\Store');
     }
-    public function customer()
+    public function sale()
     {
-        return $this->belongsTo('App\Models\Customer');
+        return $this->belongsTo('App\Models\Sale');
     }
 
     public function bankAccount()

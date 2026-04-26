@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateMovementAPIRequest;
 use App\Models\Balance;
 use App\Models\Movement;
 use App\Repositories\MovementRepository;
+use App\Services\MovementsService;
 use Facades\App\Services\DataAccessValidation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -44,44 +45,83 @@ class MovementAPIController extends AppBaseController
 
     public function balance(Request $request)
     {
-
         $input = $request->all();
-
         $balance = new Balance();
-        $for = $input['for'];
+        $for = $input['for'] ?? [];
 
-        $for['store_id'] = isset($for['store_id']) ?? session('store_id');
-
-        $valid = DataAccessValidation::validateStore($for['store_id']);
+        $storeId = $for['store_id'] ?? session('store_id');
+        $valid = DataAccessValidation::validateStore($storeId);
 
         if (!$valid) {
-            return $this->sendError('unauthorized.store','403');
+            return $this->sendError('unauthorized.store', '403');
         }
 
-        // Si llega fecha_from, busca el balance anterior hasta esa fecha
+        // 1. Identificar Sujeto y Criterios
+        $balanceCriteria = ['store_id' => $storeId];
+        $queryCriteria = ['store_id' => $storeId];
 
-        // Si no llega fecha_from, pongo balance previo en 0
-        // Porque voy a consultar todos los movimientos.
+        $subjects = ['user_id', 'customer_id', 'provider_id', 'cash_account_id'];
+        $foundSubject = null;
+        foreach ($subjects as $s) {
+            if (isset($for[$s])) {
+                $foundSubject = $s;
+                break;
+            }
+        }
+
+        if (!$foundSubject) {
+            // Balance de Tienda: Sujeto = Caja por Defecto
+            $defaultAccount = MovementsService::getDefaultCashAccount($storeId);
+            if ($defaultAccount) {
+                $balanceCriteria['cash_account_id'] = $defaultAccount->id;
+                $balance->cash_account_name = $defaultAccount->name;
+            }
+            // queryCriteria queda solo con store_id para devolver todos los movimientos de la tienda
+        } else {
+            // Balance Específico: Sujeto = Filtro enviado
+            $balanceCriteria[$foundSubject] = $for[$foundSubject];
+            $queryCriteria[$foundSubject] = $for[$foundSubject];
+        }
+
         $date_from = $input['date_from'] ?? null;
-        $balance_prev = $date_from ? $this->movementRepository->balance(null, $date_from, $for ) : 0;
-
         $date_to = $input['date_to'] ?? null;
-        $movements = $this->movementRepository->allBetween($date_from, $date_to, $for);
+
+        // 2. Obtener Balance Previo y Movimientos
+        // Usamos balanceCriteria para el saldo acumulado previo
+        $balance_prev = $date_from ? $this->movementRepository->balance(null, $date_from, $balanceCriteria) : 0;
+
+        // Usamos queryCriteria para obtener los movimientos a mostrar
+        $movements = $this->movementRepository->allBetween($date_from, $date_to, $queryCriteria);
+
         $balance->movements = $movements;
         $balance->balance_prev = $balance_prev;
         $balance->date_from = $date_from;
         $balance->date_to = $date_to;
-        $balance->customer_id = isset($for['customer_id']) ?  $for['customer_id'] : null;
-        $balance->store_id = isset($for['store_id']) ? $for['store_id'] : null;
+        $balance->customer_id = $for['customer_id'] ?? null;
+        $balance->store_id = $storeId;
 
-        $balance_acum = $balance_prev;
+        // 3. Bucle de Acumulación Condicional
+        $balance_query = 0;
+        $balance_acumulado = $balance_prev;
 
+        // return response()->json($balanceCriteria);
         foreach ($movements as $move) {
-            $balance_acum = $move->balance = $move->calculateBalance($balance_acum);
+            // Solo influyen en el saldo si coinciden con los criterios de balance
+            if ($move->matchesCriteria($balanceCriteria)) {
+                $balance_query +=  $move->getMovement();
+                $balance_acumulado = $move->calculateBalance($balance_acumulado);
+                $move->apply_balance = true;
+            } else {
+                // Si no influye, el movimiento mantiene el saldo acumulado actual
+                $move->balance = 0;
+                $move->apply_balance = false;
+            }
         }
-        $balance->balance_final = $balance_acum;
+        $balance->balance_query = $balance_query;
+        $balance->balance_final = $balance_prev + $balance_query;
         $balance->state = $balance->balance_final > 0 ? 'credit' : ($balance->balance_final < 0 ? 'debt' : 'settled');
         $balance->movements = $balance->movements->reverse()->values()->collect();
+
         return response()->json($balance);
     }
 

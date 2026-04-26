@@ -7,6 +7,8 @@ use App\Models\SettlementDetail;
 use App\Models\SaleItem;
 use App\Models\Provider;
 use App\Repositories\BaseRepository;
+use App\Services\MovementsService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -33,7 +35,8 @@ class SettlementRepository extends BaseRepository
         'paid_at',
         'paid_by',
         'cancelled_at',
-        'cancelled_by'
+        'cancelled_by',
+        'store_id'
     ];
 
     protected $fieldLikeable = [
@@ -142,12 +145,13 @@ class SettlementRepository extends BaseRepository
             $amountToPay += $calculatedAmount;
 
             $details[] = [
-                'order_item_id' => $item->id,
-                'order_id' => $sale->id,
+                'sale_item_id' => $item->id,
+                'sale_id' => $sale->id,
                 'sale_date' => $sale->created_at?->format('Y-m-d'),
                 'sale_amount' => $saleAmount,
-                'provider_percentage' => $providerPercentage,
-                'calculated_amount' => $calculatedAmount
+                'product_fee' => $providerPercentage,
+                'calculated_amount' => $calculatedAmount,
+                'product' => $product
             ];
         }
 
@@ -159,7 +163,7 @@ class SettlementRepository extends BaseRepository
             'total_sales' => round($totalSales, 2),
             'amount_to_pay' => round($amountToPay, 2),
             'sales_count' => count($saleItems),
-            'details' => $details
+            'settle_details' => $details
         ];
     }
 
@@ -193,7 +197,8 @@ class SettlementRepository extends BaseRepository
                 'amount_to_pay' => $preview['amount_to_pay'],
                 'status' => 'pending',
                 'generated_at' => Carbon::now(),
-                'generated_by' => $generatedBy
+                'generated_by' => $generatedBy,
+                'user' => Auth::user()->email,
             ]);
 
             // Get unsettled sales and create details
@@ -235,8 +240,8 @@ class SettlementRepository extends BaseRepository
         return DB::transaction(function () use ($settlementId, $cancelledBy) {
             $settlement = Settlement::findOrFail($settlementId);
 
-            if ($settlement->status !== 'pending') {
-                throw new \Exception('Can only cancel pending settlements');
+            if ($settlement->status !== 'pending' && $settlement->status !== 'paid') {
+                throw new \Exception('Can only cancel pending or paid settlements');
             }
 
             // Revert settled status on sale items
@@ -250,6 +255,9 @@ class SettlementRepository extends BaseRepository
                 'cancelled_by' => $cancelledBy
             ]);
 
+            // Delete associated movement
+            DB::table('movements')->where('settlement_id', $settlement->id)->delete();
+
             return $settlement;
         });
     }
@@ -260,21 +268,24 @@ class SettlementRepository extends BaseRepository
      * @param int $paidBy
      * @return Settlement
      */
-    public function markSettlementAsPaid($settlementId, $paidBy)
+    public function markSettlementAsPaid($settlementId, $user)
     {
-        $settlement = Settlement::findOrFail($settlementId);
+        return DB::transaction(function () use ($settlementId, $user) {
+            $settlement = Settlement::findOrFail($settlementId);
 
-        if ($settlement->status !== 'pending') {
-            throw new \Exception('Can only mark pending settlements as paid');
-        }
+            if ($settlement->status !== 'pending') {
+                throw new \Exception('Can only mark pending settlements as paid');
+            }
 
-        $settlement->update([
-            'status' => 'paid',
-            'paid_at' => Carbon::now(),
-            'paid_by' => $paidBy
-        ]);
-
-        return $settlement;
+            $settlement->update([
+                'status' => 'paid',
+                'paid_at' => Carbon::now(),
+                'paid_by' => $user->id
+            ]);
+            // Generate cash register movement
+            MovementsService::generateSettlementMovement($settlement, $user);
+            return $settlement;
+        });
     }
 
     /**

@@ -71,6 +71,7 @@ class PaymentRepository extends BaseRepository
     public function allLikeQuery($search , $where = null, $customer_id = null, $orders = null)
     {
         $query = $this->model->newQuery();
+        $query->with('sale.customer');
         $this->search = $search;
 
         if ($search) {
@@ -155,7 +156,7 @@ class PaymentRepository extends BaseRepository
     {
 
         $query = $this->model->newQuery();
-        $withs = ['customer'];
+        $withs = ['sale.customer'];
 
         if (count($withs)) {
             foreach($withs as $value) {

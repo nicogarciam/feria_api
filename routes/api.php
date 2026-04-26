@@ -63,6 +63,7 @@ Route::group([
     Route::get('providers/{providerId}/stores/{storeId}/stats', [ProviderAPIController::class, 'stats']);
 
     Route::get('stores/select/{storeId}', [StoreAPIController::class,'selectStore']);
+    Route::get('stores/{id}/cash_accounts', [StoreAPIController::class, 'cashAccounts']);
     Route::post('stores/upload_logo',[StoreAPIController::class,'updateLogo']);
 
     // Store User Management
@@ -73,7 +74,7 @@ Route::group([
 
     Route::get('my_account','App\Http\Controllers\API\AccountAPIController@myAccount');
 
-    Route::post('accounts/balance',[MovementAPIController::class,'balance']);
+    Route::post('stores/balance',[MovementAPIController::class,'balance']);
 
     Route::get('stores/{storeId}/categories', [CategoryAPIController::class,'findByStore']);
 
@@ -147,6 +148,8 @@ Route::group([
     Route::resource('product_state', App\Http\Controllers\API\ProductStateAPIController::class);
 
     Route::resource('settlements', App\Http\Controllers\API\SettlementAPIController::class);
+
+    Route::resource('withdrawals', App\Http\Controllers\API\WithdrawalAPIController::class);
 
 });
 

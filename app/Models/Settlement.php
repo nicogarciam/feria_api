@@ -60,6 +60,8 @@ class Settlement extends Model
         'paid_by',
         'cancelled_at',
         'cancelled_by',
+        'cash_account_id',
+        'origin_user_id',
         'user'
     ];
 
@@ -70,7 +72,9 @@ class Settlement extends Model
         'amount_to_pay' => 'decimal:2',
         'generated_by' => 'integer',
         'paid_by' => 'integer',
-        'cancelled_by' => 'integer'
+        'cancelled_by' => 'integer',
+        'cash_account_id' => 'integer',
+        'origin_user_id' => 'integer'
     ];
 
     /**
@@ -114,6 +118,16 @@ class Settlement extends Model
     public function cancelledBy()
     {
         return $this->belongsTo('App\Models\User', 'cancelled_by');
+    }
+
+    public function cashAccount()
+    {
+        return $this->belongsTo('App\Models\CashAccount');
+    }
+
+    public function originUser()
+    {
+        return $this->belongsTo('App\Models\User', 'origin_user_id');
     }
 
     /**
