@@ -21,8 +21,6 @@ class SaleItem extends Model
 //    public $with = 'product';
 
 
-    protected $dates = ['deleted_at'];
-
     public $fillable = [
         'sale_id',
         'product_id',

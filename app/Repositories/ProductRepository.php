@@ -139,6 +139,9 @@ class ProductRepository extends BaseRepository
         if (count($search)) {
             foreach($search as $key => $value) {
                 if (in_array($key, $this->getFieldsSearchable())) {
+                    if ($value != null && is_array($value)) {
+                        $query->whereIn($key, $value);
+                    }
                     if ($key == 'date_from') {
                         $query->where('entry_date', '>=', $value);
                     } elseif ($key == 'date_to') {
@@ -162,7 +165,7 @@ class ProductRepository extends BaseRepository
             $query->orderBy('generated_at');
         }
 
-        return $query->with(['provider', 'state', 'primaryImage']);
+        return $query->with(['provider', 'state', 'primary_image']);
     }
 
 

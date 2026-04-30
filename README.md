@@ -103,6 +103,9 @@ Asegurar permisos de escritura para:
 
 ### 6) Optimización Laravel
 
+
+ssh feriar@ssh-feriar.alwaysdata.net
+
 Ejecutar en cada deploy:
 
 ```bash

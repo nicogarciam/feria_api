@@ -74,14 +74,18 @@ class SaleAPIController extends AppBaseController
     public function index(Request $request)
     {
 
-        $states_ids = explode(',',$request->get('states'));
-        $date_from = $request->get('date_from');
-        $date_to = $request->get('date_to');
+        $statesParam = $request->get('states');
         $storeId = $request->get('store_id');
         $search = $request->except(['skip','states','limit','date_from','date_to','filter_state','sort','page','size']);
         $filter = $request->get('filter_state');
         $q = $request->get('q');
         $sort = $request->get('sort', 'created_at,desc');
+
+        // Only filter by states if provided
+        if (!empty($statesParam)) {
+            $states_ids = explode(',', $statesParam);
+            $search['sale_state_id'] = $states_ids;
+        }
 
         $valid = DataAccessValidation::validateStore($storeId);
 
@@ -101,7 +105,7 @@ class SaleAPIController extends AppBaseController
             }
         }
 
-        $query = $this->saleRepository->allSalesQueryLikeWithSort($q, $date_from, $date_to, $storeId, $orders);
+        $query = $this->saleRepository->allSalesQueryLikeWithSort($search, $q, $storeId, $orders);
 
         return PaginationService::forAngular($query, $request);
     }
@@ -129,6 +133,75 @@ class SaleAPIController extends AppBaseController
                 'message' => 'Product removed successfully',
                 'sale' => $sale,
                 'deleted' => $deleted]);
+    }
+
+    public function addProduct(Request $request, $saleId)
+    {
+        $input = $request->all();
+        $productId = $input['product_id'] ?? null;
+        $price = $input['price'] ?? null;
+
+        if (empty($saleId) || empty($productId) || $price === null) {
+            return $this->sendError('Invalid parameters: saleId, product_id, and price are required.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Check if product already exists in sale items
+            $existingItem = SaleItem::where('sale_id', $saleId)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($existingItem) {
+                // If it exists, update the price/status instead of adding
+                $existingItem->price = $price;
+                $existingItem->save();
+                $message = 'Product updated successfully.';
+            } else {
+                // 2. Insert new sale item
+                $existingItem  = SaleItem::create([
+                    'sale_id' => $saleId,
+                    'product_id' => $productId,
+                    'price' => $price,
+                    'status' => ProductState::SOLD
+                ]);
+
+                $message = 'Producto Agregado Correctamente.';
+            }
+
+            // 3. Update product state and price
+            $product = Product::find($productId);
+            if ($product) {
+                $product->state_id = ProductState::SOLD;
+                $product->price = $price;
+                $product->save();
+            }
+
+            // 4. Reload sale and update total price
+            $sale = $this->saleRepository->find($saleId, ['products','products.primary_image']);
+            if (!$sale) {
+                throw new \Exception('Sale not found.');
+            }
+
+            $sale->total_price = $sale->products->sum('price');
+            $sale->save();
+
+            // 5. Check and update sale state
+            SaleService::checkSaleState($sale, 'add.product');
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $message,
+                'sale' => $sale,
+                'sale_item' => $existingItem ?? null,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Error adding product: ' . $e->getMessage());
+        }
     }
 
     public function countResume(Request $request)
@@ -179,13 +252,13 @@ class SaleAPIController extends AppBaseController
         $input['user'] = auth()->user()->email;
 
         DB::beginTransaction();
-        $sale_state_id = $input['sale_state_id'] = isset($input['state']) ? $input['state']['id'] : SaleState::CONFIRMED ;
+        $sale_state_id = $input['sale_state_id'] = isset($input['state']) ? $input['state']['id'] : SaleState::NEW;
         $sale = $this->saleRepository->create($input);
 
         SaleService::setSaleState($sale, $sale_state_id,'sale_created',null, true);
 
         $sale_items = [];
-        $products = $input['products'];
+        $products = $input['products'] ?? [];
         foreach ($products as $p ) {
             $sale_items[] = array(
                 'sale_id' => $sale->id,
@@ -201,8 +274,10 @@ class SaleAPIController extends AppBaseController
                 ]
             );
         }
+        if ($sale_items && count($sale_items) > 0){
+            DB::table('sale_items')->insert($sale_items);
+        }
 
-        DB::table('sale_items')->insert($sale_items);
 
         DB::commit();
 

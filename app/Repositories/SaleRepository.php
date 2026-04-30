@@ -111,21 +111,30 @@ class SaleRepository extends BaseRepository
         return $query->get();
     }
 
-    public function allSalesQueryLikeWithSort($search, $date_from, $date_to, $storeId, $orders = null)
+    public function allSalesQueryLikeWithSort($search, $query, $storeId, $orders = null)
     {
         $query = $this->model->newQuery()
-            ->search($search);
+            ->withCount('sale_items')
+            ->search($query);
+
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, $this->getFieldsSearchable())) {
+                    if ($value != null && is_array($value)) {
+                        $query->whereIn($key, $value);
+                    } elseif ($key == 'date_from') {
+                        $query->where('date_sale', '>=', $value);
+                    } elseif ($key == 'date_to') {
+                        $query->where('date_sale', '<=', $value);
+                    } else{
+                        $query->where($key, $value);
+                    }
+                }
+            }
+        }
 
         if (!is_null($storeId)) {
             $query->where('store_id', $storeId);
-        }
-
-        if (!is_null($date_from)) {
-            $query->where('date_sale', '>', $date_from);
-        }
-
-        if (!is_null($date_to)) {
-            $query->where('date_sale', '<', $date_to);
         }
 
         // Handle sorting

@@ -125,11 +125,11 @@ class ProductAPIController extends AppBaseController
     public function query(Request $request)
      {
 
-         $search = $request->only(['provider_id', 'status', 'state_id', 'date_from', 'date_to','store_id','gender']);
+         $search = $request->only(['provider_id', 'status', 'state_id', 'date_from', 'date_to','store_id','gender','code']);
          $q = $request->get('q');
          $page = $request->get('page', 1);
          $size = $request->get('size', 10);
-         $sort = $request->get('sort', 'date,desc');
+         $sort = $request->get('sort', 'created_at,desc');
          $orders = null;
          if ($sort) {
              $sortParts = explode(',', $sort);

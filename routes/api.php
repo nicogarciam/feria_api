@@ -101,6 +101,7 @@ Route::group([
     Route::get('sales/resume', [SaleAPIController::class,'countResume']);
     Route::get('sales/code/{saleId}', [SaleAPIController::class,'generateCode']);
     Route::get('sales/{saleId}/remove/{productId}',[SaleAPIController::class,'removeProduct'] );
+    Route::post('sales/{saleId}/add', [SaleAPIController::class,'addProduct']);
 
     Route::get('sales/{saleId}/products', [ProductAPIController::class,'findForSale'] );
     Route::get('sales/{saleId}/pays', [PaymentAPIController::class,'findForSale'] );

@@ -86,7 +86,7 @@ class Product extends Model
         return $this->hasMany(Image::class);
     }
 
-    public function primaryImage()
+    public function primary_image()
     {
         return $this->hasOne(Image::class)->where('primary', 1);
     }
